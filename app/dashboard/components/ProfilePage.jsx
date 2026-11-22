@@ -42,6 +42,8 @@ export default function ProfilePage({ user, onBack }) {
 	const [passwordError, setPasswordError] = useState('');
 	const [passwordSuccess, setPasswordSuccess] = useState('');
 	const [subscriptionType, setSubscriptionType] = useState('');
+	const [onboardingData, setOnboardingData] = useState(null);
+	const [onboardingError, setOnboardingError] = useState('');
 	const router = useRouter();
 
 	// Always fetch profile data from Supabase on mount and on auth state change
@@ -54,25 +56,39 @@ export default function ProfilePage({ user, onBack }) {
 				router.replace('/login');
 				return;
 			}
-			// Fetch profile from user_profile table (or users table)
-			const { data: profileRow } = await supabase
+			const [{ data: profileRow, error: profileError }, { data: onboardingRow, error: onboardingFetchError }] = await Promise.all([
+				supabase
 				.from('users')
 				.select('*')
 				.eq('id', userData.user.id)
-				.single();
-			if (profileRow && isMounted) {
+				.maybeSingle(),
+				supabase
+					.from('user_onboarding')
+					.select('*')
+					.eq('user_id', userData.user.id)
+					.maybeSingle(),
+			]);
+			if (profileError) {
+				console.error('Error fetching profile:', profileError.message);
+			}
+			if (onboardingFetchError) {
+				console.error('Error fetching onboarding details:', onboardingFetchError.message);
+			}
+			if (isMounted) {
+				setOnboardingData(onboardingRow);
+				setOnboardingError(onboardingFetchError?.message || '');
 				setProfileData({
-					name: profileRow.name || userData.user.user_metadata?.name || "",
+					name: profileRow?.name || userData.user.user_metadata?.name || userData.user.email?.split('@')[0] || "",
 					email: userData.user.email,
-					phone: profileRow.phone || "",
-					location: profileRow.location || "",
-					education: profileRow.education || "",
-					experience: profileRow.experience || "",
-					bio: profileRow.bio || "",
-					skills: profileRow.skills || [],
-					interests: profileRow.interests || []
+					phone: profileRow?.phone || "",
+					location: profileRow?.location || onboardingRow?.location || "",
+					education: profileRow?.education || [onboardingRow?.profession, onboardingRow?.year, onboardingRow?.company].filter(Boolean).join(" · "),
+					experience: profileRow?.experience || (onboardingRow?.experience != null ? `${onboardingRow.experience} years` : ""),
+					bio: profileRow?.bio || "",
+					skills: profileRow?.skills || onboardingRow?.skills || [],
+					interests: profileRow?.interests || onboardingRow?.technical_interests || []
 				});
-				setSubscriptionType(profileRow.subscription_type || 'Free');
+				setSubscriptionType(profileRow?.subscription_type || 'Free');
 			}
 		};
 		fetchProfile();
@@ -209,22 +225,34 @@ export default function ProfilePage({ user, onBack }) {
 			const supabase = createClientForBrowser();
 			const { data: userData } = await supabase.auth.getUser();
 			if (!userData?.user) return;
-			const { data: profileRow } = await supabase
+			const { data: profileRow, error: profileError } = await supabase
 				.from('users')
 				.select('*')
 				.eq('id', userData.user.id)
-				.single();
-			if (profileRow) {
+				.maybeSingle();
+			if (profileError) {
+				console.error('Error refreshing profile:', profileError.message);
+			}
+			const { data: onboardingRow, error: onboardingFetchError } = await supabase
+				.from('user_onboarding')
+				.select('*')
+				.eq('user_id', userData.user.id)
+				.maybeSingle();
+			if (onboardingFetchError) {
+				console.error('Error refreshing onboarding details:', onboardingFetchError.message);
+			}
+			setOnboardingData(onboardingRow);
+			if (profileRow || onboardingRow) {
 				setProfileData({
-					name: profileRow.name || userData.user.user_metadata?.name || "",
+					name: profileRow?.name || userData.user.user_metadata?.name || userData.user.email?.split('@')[0] || "",
 					email: userData.user.email,
-					phone: profileRow.phone || "",
-					location: profileRow.location || "",
-					education: profileRow.education || "",
-					experience: profileRow.experience || "",
-					bio: profileRow.bio || "",
-					skills: profileRow.skills || [],
-					interests: profileRow.interests || []
+					phone: profileRow?.phone || "",
+					location: profileRow?.location || onboardingRow?.location || "",
+					education: profileRow?.education || [onboardingRow?.profession, onboardingRow?.year, onboardingRow?.company].filter(Boolean).join(" · "),
+					experience: profileRow?.experience || (onboardingRow?.experience != null ? `${onboardingRow.experience} years` : ""),
+					bio: profileRow?.bio || "",
+					skills: profileRow?.skills || onboardingRow?.skills || [],
+					interests: profileRow?.interests || onboardingRow?.technical_interests || []
 				});
 			}
 		};
@@ -426,6 +454,44 @@ export default function ProfilePage({ user, onBack }) {
 					)}
 				</div>
 			</div>
+
+			{onboardingError && (
+				<div className="rounded-lg border border-amber-700/40 bg-amber-900/20 p-4 text-sm text-amber-200" role="status">
+					Your onboarding responses could not be loaded: {onboardingError}
+				</div>
+			)}
+			{onboardingData && (
+				<section className="rounded-xl border border-gray-700 bg-[#18191b] p-6">
+					<h4 className="mb-4 text-lg font-semibold text-cyan-400">Onboarding Details</h4>
+					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+						{[
+							["Age", onboardingData.age],
+							["Profession", onboardingData.profession],
+							["Year", onboardingData.year],
+							["Location", onboardingData.location],
+							["Company / Institute", onboardingData.company],
+							["Experience", onboardingData.experience != null ? `${onboardingData.experience} years` : ""],
+							["Career level", onboardingData.career_level],
+							["Target roles", onboardingData.target_roles],
+							["Preferred industry", onboardingData.industry],
+							["Looking for", onboardingData.looking_for],
+							["Skills", onboardingData.skills],
+							["Technical interests", onboardingData.technical_interests],
+							["Other technical interests", onboardingData.technical_other],
+							["Talento AI usage", onboardingData.usage],
+							["Other usage", onboardingData.usage_other],
+							["Resume style", onboardingData.resume_style],
+							["Resume sections", onboardingData.add_sections],
+							["Social links", onboardingData.social_links],
+						].filter(([, value]) => Array.isArray(value) ? value.length > 0 : value !== null && value !== undefined && value !== "").map(([label, value]) => (
+							<div key={label} className="min-w-0 rounded-lg bg-[#111722] p-3">
+								<p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</p>
+								<p className="break-words text-sm text-gray-200">{Array.isArray(value) ? value.join(", ") : value}</p>
+							</div>
+						))}
+					</div>
+				</section>
+			)}
 
 			{/* Account Actions */}
 			<div className="bg-[#232323] rounded-xl p-6 border border-gray-700">
