@@ -129,7 +129,7 @@ export default function OnboardingPage() {
           <div className="space-y-6 animate-fadeIn">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-cyan-400 mb-2">Welcome to TALENTO AI</h2>
-              <p className="text-gray-300">Let's get to know you better to personalize your experience</p>
+              <p className="text-gray-300">Let&apos;s get to know you better to personalize your experience</p>
             </div>
 
             {/* Age */}
@@ -270,7 +270,7 @@ export default function OnboardingPage() {
           <div className="space-y-6 animate-fadeIn">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-cyan-400 mb-2">Your Goals</h2>
-              <p className="text-gray-300">Tell us what you're looking to achieve</p>
+              <p className="text-gray-300">Tell us what you&apos;re looking to achieve</p>
             </div>
 
             {/* Usage */}

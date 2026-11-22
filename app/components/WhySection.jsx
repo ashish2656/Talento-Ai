@@ -90,7 +90,7 @@ export default function WhySection() {
 								<p className="text-gray-600 dark:text-gray-400 text-sm">
 									80% of our subscribers secure their dream jobs within 3
 									months, with 40% landing $100K+ offers. Your success is our
-									guarantee. Talento AI's proven track record speaks for itself,
+									guarantee. Talento AI&apos;s proven track record speaks for itself,
 									with thousands of satisfied users worldwide.
 								</p>
 							</div>
@@ -174,7 +174,7 @@ export default function WhySection() {
 								<p className="text-gray-600 dark:text-gray-400 text-sm">
 									The only dual-layer platform offering both an AI Copilot and
 									an AI Coach running simultaneously, delivering real-time
-									insights and instant corrections. Talento AI's technology
+									insights and instant corrections. Talento AI&apos;s technology
 									ensures you are always interview-ready.
 								</p>
 							</div>

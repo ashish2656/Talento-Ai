@@ -59,7 +59,7 @@ export default function DemoRequestPage() {
 						Request Enterprise Demo
 					</h1>
 					<p className="text-gray-300 text-xl max-w-3xl mx-auto">
-						Discover how Talento AI can transform your organization's talent development and career growth initiatives
+						Discover how Talento AI can transform your organization&apos;s talent development and career growth initiatives
 					</p>
 				</motion.div>
 
@@ -279,7 +279,7 @@ export default function DemoRequestPage() {
 								<h4 className="text-white font-semibold">Contact Information</h4>
 							</div>
 							<p className="text-gray-300 text-sm mb-3">
-								Can't wait for the demo? Reach out to us directly:
+								Can&apos;t wait for the demo? Reach out to us directly:
 							</p>
 							<div className="space-y-2 text-sm">
 								<p className="text-gray-300">

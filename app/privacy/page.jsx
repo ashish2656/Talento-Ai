@@ -67,7 +67,7 @@ export default function PrivacyPage() {
                         <h2 className="text-2xl font-semibold text-white mt-8 mb-4">Changes to This Policy</h2>
                         <p className="mb-6">
                             We may update this privacy policy from time to time. We will notify you of any changes by posting
-                            the new policy on this page and updating the "Last Updated" date.
+                            the new policy on this page and updating the &quot;Last Updated&quot; date.
                         </p>
 
                         <h2 className="text-2xl font-semibold text-white mt-8 mb-4">Contact Us</h2>

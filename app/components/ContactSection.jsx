@@ -68,7 +68,7 @@ export default function ContactSection() {
 			<div className="max-w-4xl mx-auto text-center">
 				<h2 className="text-3xl sm:text-4xl font-bold mb-4 text-gray-900 dark:text-white">Contact & Support</h2>
 				<p className="text-gray-600 dark:text-gray-400 mb-12 text-lg max-w-2xl mx-auto">
-					Have any Questions? Contact us below and we'll get back to you as soon as possible.
+					Have any Questions? Contact us below and we&apos;ll get back to you as soon as possible.
 				</p>
 
 				{message && (

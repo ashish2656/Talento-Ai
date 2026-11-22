@@ -480,7 +480,7 @@ function AssessmentResultsContent() {
 							transition={{ delay: 1.5, duration: 0.6 }}
 							className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl rounded-3xl border border-gray-700/50 p-8 mt-8"
 						>
-							<h3 className="text-2xl font-bold text-white text-center mb-6">What's Next?</h3>
+							<h3 className="text-2xl font-bold text-white text-center mb-6">What&apos;s Next?</h3>
 							<div className="flex flex-col sm:flex-row gap-6 justify-center">
 								<motion.button
 									whileHover={{ scale: 1.05 }}

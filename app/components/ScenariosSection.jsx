@@ -46,7 +46,7 @@ export default function ScenariosSection() {
 					Support All Scenarios
 				</h2>
 				<p className="text-gray-600 dark:text-gray-400 text-center mb-16 text-lg max-w-2xl mx-auto">
-					From technical interviews to case studies, we've got you covered
+					From technical interviews to case studies, we&apos;ve got you covered
 				</p>
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 					{scenarios.map((s, i) => (
