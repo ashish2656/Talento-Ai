@@ -28,8 +28,8 @@ export default function ReferralTab() {
 			color: "text-cyan-400",
 		},
 		{
-			title: "Extended Practice Sessions",
-			description: "Unlock unlimited practice sessions for both you and your friend",
+			title: "Assessment Credits",
+			description: "Unlock more assessment attempts for both you and your friend",
 			icon: UserGroupIcon,
 			color: "text-green-400",
 		},
@@ -37,7 +37,7 @@ export default function ReferralTab() {
 			title: "Priority Support",
 			description: "Get priority customer support for you and your referrals",
 			icon: ShareIcon,
-			color: "text-purple-400",
+			color: "text-amber-400",
 		},
 	];
 
@@ -80,7 +80,7 @@ export default function ReferralTab() {
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ delay: 0.1 }}
-				className="bg-gradient-to-r from-cyan-900 to-blue-900 rounded-2xl p-8 border border-cyan-700"
+				className="bg-gradient-to-r from-cyan-900 to-slate-900 rounded-2xl p-8 border border-cyan-700"
 			>
 				<div className="text-center">
 					<h3 className="text-2xl font-bold text-white mb-4">Your Referral Code</h3>
@@ -153,7 +153,7 @@ export default function ReferralTab() {
 							transition={{ delay: 0.5 + index * 0.1 }}
 							className="text-center"
 						>
-							<div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+							<div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-teal-700 rounded-full flex items-center justify-center mx-auto mb-4">
 								<span className="text-white font-bold text-lg">{step.step}</span>
 							</div>
 							<h4 className="text-lg font-semibold text-white mb-2">
@@ -172,7 +172,7 @@ export default function ReferralTab() {
 				transition={{ delay: 0.6 }}
 				className="grid grid-cols-1 md:grid-cols-3 gap-6"
 			>
-				<div className="bg-gradient-to-r from-cyan-900 to-blue-900 rounded-xl p-6 text-center border border-cyan-700">
+				<div className="bg-gradient-to-r from-cyan-900 to-slate-900 rounded-xl p-6 text-center border border-cyan-700">
 					<div className="text-3xl font-bold text-cyan-400 mb-2">0</div>
 					<div className="text-gray-300">Successful Referrals</div>
 				</div>
@@ -180,8 +180,8 @@ export default function ReferralTab() {
 					<div className="text-3xl font-bold text-green-400 mb-2">0</div>
 					<div className="text-gray-300">Days Premium Access</div>
 				</div>
-				<div className="bg-gradient-to-r from-purple-900 to-indigo-900 rounded-xl p-6 text-center border border-purple-700">
-					<div className="text-3xl font-bold text-purple-400 mb-2">₹0</div>
+				<div className="bg-gradient-to-r from-emerald-900 to-slate-900 rounded-xl p-6 text-center border border-emerald-800">
+					<div className="text-3xl font-bold text-amber-400 mb-2">₹0</div>
 					<div className="text-gray-300">Total Rewards Earned</div>
 				</div>
 			</motion.div>

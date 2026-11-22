@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
+import { getSupabaseConfig } from './utils/supabase/env'
 
 const protectedRoutes = [
   '/dashboard',
@@ -7,7 +8,6 @@ const protectedRoutes = [
   '/protected',
   '/profile',
   '/assessment',
-  '/practice',
   '/career',
   '/onboarding',
 ];
@@ -30,6 +30,12 @@ const skipMiddlewareRoutes = [
  * */
 export const middleware = async request => {
     const pathname = request.nextUrl.pathname
+
+    const { supabaseUrl, supabaseKey, hasConfig } = getSupabaseConfig()
+
+    if (!hasConfig) {
+        return NextResponse.next()
+    }
     
     // Skip middleware for auth-related routes and API routes
     if (skipMiddlewareRoutes.some(route => pathname.startsWith(route))) {
@@ -41,8 +47,8 @@ export const middleware = async request => {
     })
 
     const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        supabaseUrl,
+        supabaseKey,
         {
             cookies: {
                 getAll() {

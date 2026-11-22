@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
+import { getSupabaseConfig } from '@/utils/supabase/env';
 
 export async function GET() {
   try {
     // Check environment variables
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const { supabaseUrl, supabaseKey } = getSupabaseConfig();
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
     
     // Check if required variables are set
@@ -12,7 +12,8 @@ export async function GET() {
       supabase: {
         url: supabaseUrl ? '✅ Set' : '❌ Missing',
         key: supabaseKey ? '✅ Set' : '❌ Missing',
-        valid: !!(supabaseUrl && supabaseKey)
+        valid: !!(supabaseUrl && supabaseKey),
+        fallbackMode: !(supabaseUrl && supabaseKey)
       },
       site: {
         url: siteUrl ? '✅ Set' : '⚠️ Not set (optional)',

@@ -193,7 +193,7 @@ export function EnhancedProgressCharts({ userId }) {
                 </div>
                 <div className="w-full bg-gray-600 rounded-full h-2">
                   <div
-                    className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full transition-all duration-300"
+                    className="bg-gradient-to-r from-cyan-400 to-teal-600 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${Math.min(accuracy, 100)}%` }}
                   />
                 </div>

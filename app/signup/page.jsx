@@ -86,57 +86,33 @@ export default function SignupPage() {
 		setIsLoading(true);
 
 		try {
-			// Debug: Log environment variables (remove in production)
-			console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-			console.log("Supabase ANON KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-
 			const supabase = createClientForBrowser();
-
-			// Debug: Log before signup
-			console.log("Attempting signup with:", formData.email);
+			const name = `${formData.firstName} ${formData.lastName}`.trim();
 
 			const { data, error } = await supabase.auth.signUp({
 				email: formData.email,
 				password: formData.password,
 				options: {
+					emailRedirectTo: `${window.location.origin}/auth/confirm?next=/onboarding`,
 					data: {
-						name: `${formData.firstName} ${formData.lastName}`.trim(),
+						name,
 						firstName: formData.firstName,
 						lastName: formData.lastName,
+						onboarded: false,
 					},
 				},
 			});
 
-			// Debug: Log response
-			console.log("Signup response:", { data, error });
-
-			let alreadyExists = false;
 			if (error) {
-				if (
-					error.code === 'user_already_exists' ||
-					error.code === 'email_exists'
-				) {
-					alreadyExists = true;
+				if (error.code === 'user_already_exists' || error.code === 'email_exists') {
+					setErrors({ general: 'An account with this email already exists. Please try logging in.' });
+				} else {
+					setErrors({ general: error.message });
 				}
-			}
-			// If user exists but is unverified, send to OTP
-			if (!error && data && data.user && !data.session) {
-				alreadyExists = true;
-			}
-
-			if (alreadyExists) {
-				// Check if user is unverified (email_confirmed_at is null)
-				if (data && data.user && !data.user.email_confirmed_at) {
-					router.push(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
-					return;
-				}
-				setErrors({
-					general: 'An account with this email already exists. Please try logging in.',
-				});
-			} else if (error) {
-				setErrors({ general: error.message });
+			} else if (data?.user && !data.session) {
+				router.push(`/verify-otp?email=${encodeURIComponent(formData.email)}&purpose=confirm-link`);
 			} else {
-				router.push(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
+				router.push('/onboarding');
 			}
 		} catch (error) {
 			// Improved error feedback

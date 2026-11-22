@@ -148,18 +148,18 @@ export default function LinkedInPostGeneratorTab() {
 		<div className="space-y-8">
 			{/* Animated background */}
 			<div className="fixed inset-0 overflow-hidden pointer-events-none">
-				<div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-full blur-3xl animate-pulse"></div>
-				<div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-purple-500/10 to-pink-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+				<div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-500/10 to-teal-700/10 rounded-full blur-3xl animate-pulse"></div>
+				<div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-emerald-500/10 to-emerald-700/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
 			</div>
 
 			{/* Header */}
 			<div className="relative z-10 bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-8 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300">
 				<div className="flex items-center space-x-4">
-					<div className="p-3 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl">
+					<div className="p-3 bg-gradient-to-r from-cyan-400 to-teal-600 rounded-xl">
 						<GlobeAltIcon className="h-8 w-8 text-white" />
 					</div>
 					<div>
-						<h2 className="text-3xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent tracking-tight">LinkedIn Post Generator</h2>
+						<h2 className="text-3xl font-black bg-gradient-to-r from-cyan-400 via-slate-400 to-teal-700 bg-clip-text text-transparent tracking-tight">LinkedIn Post Generator</h2>
 						<p className="text-gray-400 text-lg font-medium">Generate and post professional content directly to your LinkedIn profile</p>
 					</div>
 				</div>
@@ -202,7 +202,7 @@ export default function LinkedInPostGeneratorTab() {
 				animate={{ opacity: 1, y: 0 }}
 				className="relative z-10 bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-8 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300"
 			>
-				<h3 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-6">
+				<h3 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-teal-600 bg-clip-text text-transparent mb-6">
 					Post Configuration
 				</h3>
 

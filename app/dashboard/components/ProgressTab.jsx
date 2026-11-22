@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import createClientForBrowser from '@/utils/supabase/client';
 import { EnhancedProgressCharts } from './EnhancedProgressCharts';
+import { getMergedAssessmentResults } from '../../../utils/assessmentDataStore';
 
 ChartJS.register(
 	CategoryScale,
@@ -43,12 +44,10 @@ export default function ProgressTab() {
 			if (!userData?.user) return;
 			setUserId(userData.user.id);
 
-			// Fetch from simple assessment_results table
-			const { data: resultsData, error: resultsError } = await supabase
-				.from('assessment_results')
-				.select('*')
-				.eq('user_id', userData.user.id)
-				.order('completed_at', { ascending: true });
+			// Fetch merged remote/local assessment results.
+			const combinedResults = await getMergedAssessmentResults(userData.user.id);
+			const resultsData = combinedResults;
+			const resultsError = null;
 
 			// Also fetch progress data
 			const { data: progressData, error: progressError } = await supabase
@@ -84,27 +83,39 @@ export default function ProgressTab() {
 		}
 		fetchResults();
 
-		// Set up real-time listener for new assessments
+		const handleAssessmentCompleted = () => {
+			setRefreshKey(prev => prev + 1);
+			fetchResults();
+		};
+		window.addEventListener('talento:assessment-completed', handleAssessmentCompleted);
+
+		// Set up real-time listener when Supabase Realtime is available
 		const supabase = createClientForBrowser();
-		const channel = supabase
-			.channel('assessment_updates')
-			.on(
-				'postgres_changes',
-				{
-					event: 'INSERT',
-					schema: 'public',
-					table: 'assessment_results'
-				},
-				(payload) => {
-					console.log('New assessment completed:', payload);
-					setRefreshKey(prev => prev + 1);
-					setTimeout(() => fetchResults(), 1000); // Refresh data when new assessment is completed
-				}
-			)
-			.subscribe();
+		let channel = null;
+		if (!supabase.__fallback && typeof supabase.channel === 'function') {
+			channel = supabase
+				.channel('assessment_updates')
+				.on(
+					'postgres_changes',
+					{
+						event: 'INSERT',
+						schema: 'public',
+						table: 'assessment_results'
+					},
+					(payload) => {
+						console.log('New assessment completed:', payload);
+						setRefreshKey(prev => prev + 1);
+						setTimeout(() => fetchResults(), 1000);
+					}
+				)
+				.subscribe();
+		}
 
 		return () => {
-			supabase.removeChannel(channel);
+			window.removeEventListener('talento:assessment-completed', handleAssessmentCompleted);
+			if (channel && typeof supabase.removeChannel === 'function') {
+				supabase.removeChannel(channel);
+			}
 		};
 	}, []);
 
@@ -113,7 +124,7 @@ export default function ProgressTab() {
 		const filtered = (assessmentResults || []).filter(r => r?.assessment_type === type);
 		const colorMap = {
 			aptitude: 'rgb(34, 197, 214)',
-			technical: 'rgb(168, 85, 247)',
+			technical: 'rgb(20, 184, 166)',
 			personality: 'rgb(34, 197, 94)',
 			communication: 'rgb(251, 191, 36)'
 		};
@@ -256,14 +267,14 @@ export default function ProgressTab() {
 				data: getSkillsDistribution(),
 				backgroundColor: [
 					'rgba(34, 197, 214, 0.8)',
-					'rgba(168, 85, 247, 0.8)',
+					'rgba(20, 184, 166, 0.8)',
 					'rgba(251, 191, 36, 0.8)',
 					'rgba(34, 197, 94, 0.8)',
 					'rgba(249, 115, 22, 0.8)',
 				],
 				borderColor: [
 					'rgba(34, 197, 214, 1)',
-					'rgba(168, 85, 247, 1)',
+					'rgba(20, 184, 166, 1)',
 					'rgba(251, 191, 36, 1)',
 					'rgba(34, 197, 94, 1)',
 					'rgba(239, 68, 68, 1)',

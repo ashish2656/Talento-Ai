@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClientForServer } from '@/utils/supabase/server';
+import { getSupabaseConfig } from '@/utils/supabase/env';
 
 export async function GET(request) {
   try {
@@ -42,8 +43,8 @@ export async function GET(request) {
       })),
       environment: {
         node_env: process.env.NODE_ENV,
-        supabase_url: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'set' : 'missing',
-        supabase_anon_key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'set' : 'missing',
+        supabase_url: getSupabaseConfig().supabaseUrl ? 'set' : 'missing',
+        supabase_anon_key: getSupabaseConfig().supabaseKey ? 'set' : 'missing',
       }
     });
   } catch (error) {

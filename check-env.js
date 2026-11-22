@@ -6,7 +6,7 @@ console.log('🔍 Checking TalentoAI Environment Configuration...\n');
 // Check required environment variables
 const requiredEnvVars = [
   'NEXT_PUBLIC_SUPABASE_URL',
-  'NEXT_PUBLIC_SUPABASE_ANON_KEY'
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY'
 ];
 
 const optionalEnvVars = [

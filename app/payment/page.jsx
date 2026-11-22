@@ -50,7 +50,7 @@ export default function PaymentPage() {
 
 			// Razorpay configuration
 			const options = {
-				key: 'rzp_test_R800nyYb6EHdmN', // Your Razorpay Key ID
+				key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
 				amount: orderData.amount,
 				currency: orderData.currency,
 				name: 'Talento AI',

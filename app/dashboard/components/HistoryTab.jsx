@@ -51,8 +51,8 @@ export default function HistoryTab() {
             let containerClass = "mb-6 p-4 rounded-lg border";
 
             if (title.includes('🔍') || title.includes('EXTRACTED')) {
-                headerClass = "text-lg font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-3";
-                containerClass += " bg-blue-900/20 border-blue-500/30";
+                headerClass = "text-lg font-bold bg-gradient-to-r from-cyan-400 to-cyan-400 bg-clip-text text-transparent mb-3";
+                containerClass += " bg-slate-800/20 border-cyan-500/30";
             } else if (title.includes('✅') || title.includes('STRENGTHS')) {
                 headerClass = "text-lg font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-3";
                 containerClass += " bg-green-900/20 border-green-500/30";
@@ -60,14 +60,14 @@ export default function HistoryTab() {
                 headerClass = "text-lg font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-3";
                 containerClass += " bg-yellow-900/20 border-yellow-500/30";
             } else if (title.includes('🚀') || title.includes('OPTIMIZATION')) {
-                headerClass = "text-lg font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-3";
-                containerClass += " bg-purple-900/20 border-purple-500/30";
+                headerClass = "text-lg font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-3";
+                containerClass += " bg-slate-800/20 border-emerald-500/30";
             } else if (title.includes('📈') || title.includes('ATS') || title.includes('SCORE')) {
-                headerClass = "text-lg font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-3";
-                containerClass += " bg-indigo-900/20 border-indigo-500/30";
+                headerClass = "text-lg font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent mb-3";
+                containerClass += " bg-slate-800/20 border-cyan-600/30";
             } else if (title.includes('🎯') || title.includes('NEXT STEPS')) {
-                headerClass = "text-lg font-bold bg-gradient-to-r from-pink-400 to-red-400 bg-clip-text text-transparent mb-3";
-                containerClass += " bg-pink-900/20 border-pink-500/30";
+                headerClass = "text-lg font-bold bg-gradient-to-r from-amber-400 to-red-400 bg-clip-text text-transparent mb-3";
+                containerClass += " bg-slate-800/20 border-amber-500/30";
             } else if (title.includes('PRIORITY')) {
                 headerClass = "text-md font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-3";
                 containerClass += " bg-orange-900/20 border-orange-500/30";
@@ -305,11 +305,11 @@ export default function HistoryTab() {
     const getAnalysisColor = (type) => {
         switch (type) {
             case 'ats_score':
-                return 'border-blue-600 bg-blue-600/20 text-blue-400';
+                return 'border-cyan-600 bg-cyan-700/20 text-cyan-400';
             case 'optimization':
                 return 'border-green-600 bg-green-600/20 text-green-400';
             default:
-                return 'border-purple-600 bg-purple-600/20 text-purple-400';
+                return 'border-emerald-700 bg-emerald-600/20 text-amber-400';
         }
     };
 
@@ -533,7 +533,7 @@ export default function HistoryTab() {
                                                                                 <span className="text-cyan-400 font-medium">Keywords:</span>
                                                                                 <div className="flex flex-wrap gap-1 mt-1">
                                                                                     {analysis.suggestions.keywords.map((keyword, idx) => (
-                                                                                        <span key={idx} className="bg-blue-600/20 text-blue-300 px-2 py-1 rounded text-xs">
+                                                                                        <span key={idx} className="bg-cyan-700/20 text-cyan-300 px-2 py-1 rounded text-xs">
                                                                                             {keyword}
                                                                                         </span>
                                                                                     ))}

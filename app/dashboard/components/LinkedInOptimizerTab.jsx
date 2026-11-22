@@ -51,18 +51,18 @@ export default function LinkedInOptimizerTab() {
 		<div className="space-y-8">
 			{/* Animated background */}
 			<div className="fixed inset-0 overflow-hidden pointer-events-none">
-				<div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-full blur-3xl animate-pulse"></div>
-				<div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-purple-500/10 to-pink-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+				<div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-500/10 to-teal-700/10 rounded-full blur-3xl animate-pulse"></div>
+				<div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-emerald-500/10 to-emerald-700/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
 			</div>
 
 			{/* Header */}
 			<div className="relative z-10 bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-8 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300">
 				<div className="flex items-center space-x-4">
-					<div className="p-3 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl">
+					<div className="p-3 bg-gradient-to-r from-cyan-400 to-teal-600 rounded-xl">
 						<ChatBubbleLeftRightIcon className="h-8 w-8 text-white" />
 					</div>
 					<div>
-						<h2 className="text-3xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent tracking-tight">LinkedIn Post Optimizer</h2>
+						<h2 className="text-3xl font-black bg-gradient-to-r from-cyan-400 via-slate-400 to-teal-700 bg-clip-text text-transparent tracking-tight">LinkedIn Post Optimizer</h2>
 						<p className="text-gray-400 text-lg font-medium">Generate professional LinkedIn posts based on your prompts and experiences.</p>
 					</div>
 				</div>
@@ -70,7 +70,7 @@ export default function LinkedInOptimizerTab() {
 
 			{/* Input Section */}
 			<div className="relative z-10 bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-8 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300">
-				<h3 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-6">
+				<h3 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-teal-600 bg-clip-text text-transparent mb-6">
 					Describe Your Content
 				</h3>
 
@@ -91,7 +91,7 @@ export default function LinkedInOptimizerTab() {
 					<button
 						onClick={handleGeneratePosts}
 						disabled={!prompt.trim() || isGenerating}
-						className="group w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-4 px-6 rounded-xl font-bold hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
+						className="group w-full bg-gradient-to-r from-cyan-500 to-teal-700 text-white py-4 px-6 rounded-xl font-bold hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3"
 					>
 						{isGenerating ? (
 							<>
@@ -111,7 +111,7 @@ export default function LinkedInOptimizerTab() {
 			{/* Recommendations Section */}
 			{recommendations.length > 0 && (
 				<div className="relative z-10 space-y-6">
-					<h3 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+					<h3 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-teal-600 bg-clip-text text-transparent">
 						Generated Posts
 					</h3>
 
@@ -147,7 +147,7 @@ export default function LinkedInOptimizerTab() {
 									<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-cyan-900 text-cyan-300">
 										{post.type}
 									</span>
-									<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-900 text-blue-300">
+									<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-slate-800 text-cyan-300">
 										LinkedIn Ready
 									</span>
 								</div>

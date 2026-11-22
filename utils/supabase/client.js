@@ -1,11 +1,19 @@
 'use client'
 
 import { createBrowserClient } from '@supabase/ssr'
+import createFallbackSupabaseClient from './fallback'
+import { getSupabaseConfig } from './env'
 
-const createClientForBrowser = () =>
-    createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+const createClientForBrowser = () => {
+    const { supabaseUrl, supabaseKey, hasConfig } = getSupabaseConfig()
+
+    if (!hasConfig) {
+        return createFallbackSupabaseClient()
+    }
+
+    return createBrowserClient(
+        supabaseUrl,
+        supabaseKey,
         {
             auth: {
                 autoRefreshToken: true,
@@ -15,5 +23,6 @@ const createClientForBrowser = () =>
             },
         }
     )
+}
 
 export default createClientForBrowser

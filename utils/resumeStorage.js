@@ -3,18 +3,41 @@
 // Upload file to Supabase storage
 export const uploadResumeFile = async (supabase, userId, file) => {
     try {
+        if (file.size > 10 * 1024 * 1024) {
+            return { success: false, error: 'Resume must be 10MB or smaller.' };
+        }
+
         const fileExt = file.name.split('.').pop();
         const fileName = `${userId}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
-        const { data, error } = await supabase.storage
-            .from('resumes')
-            .upload(fileName, file);
+        const bucketNames = ['resumes', 'resume'];
+        let lastError = null;
 
-        if (error) throw error;
-        return { success: true, fileName, filePath: data.path };
+        for (const bucketName of bucketNames) {
+            const { data, error } = await supabase.storage
+                .from(bucketName)
+                .upload(fileName, file, {
+                    upsert: true,
+                    contentType: file.type || 'application/octet-stream',
+                });
+
+            if (!error) {
+                return { success: true, fileName, filePath: data.path, bucketName };
+            }
+
+            lastError = error;
+            if (!/bucket.*not found|not found/i.test(error.message || '')) {
+                break;
+            }
+        }
+
+        throw lastError || new Error('Unable to access the resume storage bucket.');
     } catch (error) {
         console.error('Error uploading file:', error);
-        return { success: false, error: error.message };
+        const message = /bucket.*not found|not found/i.test(error.message || '')
+            ? 'Resume storage bucket is not configured in Supabase. Please create a private "resumes" bucket.'
+            : error.message;
+        return { success: false, error: message };
     }
 };
 

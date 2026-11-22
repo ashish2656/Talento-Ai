@@ -4,10 +4,17 @@ export async function POST(request) {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = await request.json();
 
+    if (!process.env.RAZORPAY_KEY_SECRET) {
+      return Response.json(
+        { success: false, error: 'Razorpay credentials are not configured' },
+        { status: 500 }
+      );
+    }
+
     // Verify the payment signature
     const text = `${razorpay_order_id}|${razorpay_payment_id}`;
     const signature = crypto
-      .createHmac('sha256', 'AmyIQT0BdBaQLIzT7r0cwNg5') // Your Razorpay secret
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
       .update(text)
       .digest('hex');
 

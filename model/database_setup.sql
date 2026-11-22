@@ -82,8 +82,18 @@ CREATE TRIGGER update_resumes_updated_at
 
 -- 8. Create storage bucket for resume files
 -- Run this in SQL Editor to create the bucket:
-INSERT INTO storage.buckets (id, name, public) 
-VALUES ('resumes', 'resumes', false);
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'resumes',
+  'resumes',
+  false,
+  10485760,
+  ARRAY['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']
+)
+ON CONFLICT (id) DO UPDATE SET
+  public = false,
+  file_size_limit = EXCLUDED.file_size_limit,
+  allowed_mime_types = EXCLUDED.allowed_mime_types;
 
 -- 9. Create storage policies for resume files
 -- Run these in SQL Editor after creating the bucket:

@@ -9,7 +9,7 @@ const CAREER_STEPS = [
 		title: "Self-Assessment",
 		description: "Understand your strengths, interests, and skills. Take our assessments to get started.",
 		icon: "🎯",
-		color: "from-cyan-900 to-blue-900",
+		color: "from-cyan-900 to-slate-900",
 		borderColor: "border-cyan-700"
 	},
 	{
@@ -25,8 +25,8 @@ const CAREER_STEPS = [
 		title: "Set Goals",
 		description: "Define your short-term and long-term career goals.",
 		icon: "🎯",
-		color: "from-purple-900 to-pink-900",
-		borderColor: "border-purple-700"
+		color: "from-emerald-900 to-slate-900",
+		borderColor: "border-emerald-800"
 	},
 	{
 		step: 4,
@@ -118,7 +118,7 @@ export default function CareerPlanningTab() {
 											whileInView={{ opacity: 1, scale: 1 }}
 											viewport={{ once: true, amount: 0.3 }}
 											transition={{ duration: 0.6, type: 'spring', bounce: 0.2 }}
-											className="bg-gradient-to-r from-cyan-900 to-blue-900 text-cyan-200 px-4 py-2 rounded-full text-sm font-medium border border-cyan-700 hover:scale-105 transition-all duration-200 cursor-pointer"
+											className="bg-gradient-to-r from-cyan-900 to-slate-900 text-cyan-200 px-4 py-2 rounded-full text-sm font-medium border border-cyan-700 hover:scale-105 transition-all duration-200 cursor-pointer"
 										>
 											{path}
 										</motion.span>
@@ -192,7 +192,7 @@ export default function CareerPlanningTab() {
 						Career Tools
 					</h3>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-						<div className="bg-gradient-to-br from-cyan-900 to-blue-900 rounded-lg p-4 border border-cyan-700">
+						<div className="bg-gradient-to-br from-cyan-900 to-slate-900 rounded-lg p-4 border border-cyan-700">
 							<h4 className="text-lg font-semibold text-white mb-2">Resume Builder</h4>
 							<p className="text-gray-200 text-sm mb-3">Create professional resumes tailored to your target roles</p>
 							<button className="bg-cyan-400 text-black px-3 py-1 rounded text-sm font-medium hover:bg-cyan-300 transition">
@@ -206,10 +206,10 @@ export default function CareerPlanningTab() {
 								Practice Now
 							</button>
 						</div>
-						<div className="bg-gradient-to-br from-purple-900 to-pink-900 rounded-lg p-4 border border-purple-700">
+						<div className="bg-gradient-to-br from-emerald-900 to-slate-900 rounded-lg p-4 border border-emerald-800">
 							<h4 className="text-lg font-semibold text-white mb-2">Skills Assessment</h4>
 							<p className="text-gray-200 text-sm mb-3">Evaluate your technical and soft skills</p>
-							<button className="bg-purple-400 text-black px-3 py-1 rounded text-sm font-medium hover:bg-purple-300 transition">
+							<button className="bg-emerald-400 text-black px-3 py-1 rounded text-sm font-medium hover:bg-amber-300 transition">
 								Take Test
 							</button>
 						</div>

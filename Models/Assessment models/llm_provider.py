@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 load_dotenv('.env')
 load_dotenv('../../.env')
+load_dotenv('../../.env.local')
 
 # Debug: Print current working directory and check for .env files
 print(f"Current working directory: {os.getcwd()}")
@@ -29,14 +30,14 @@ def get_chat_model() -> Optional[object]:
     openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
     print(f"API key found: {openrouter_api_key is not None}")
     if openrouter_api_key:
-        print(f"API key preview: {openrouter_api_key[:15]}...")
+        print("API key configured")
     
     if openrouter_api_key and ChatOpenAI is not None:
         try:
             model = ChatOpenAI(
                 api_key=openrouter_api_key,
                 base_url="https://openrouter.ai/api/v1",
-                model="microsoft/phi-3-mini-128k-instruct",
+                model="openai/gpt-4o-mini",
                 temperature=0.7,
                 max_tokens=2000,
             )

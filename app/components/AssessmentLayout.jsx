@@ -7,15 +7,14 @@ import Sidebar from "../dashboard/components/Sidebar";
 import {
 	ChartBarIcon,
 	ChatBubbleLeftRightIcon,
-	PlayCircleIcon,
 	BriefcaseIcon,
 	ArrowTrendingUpIcon,
 } from "@heroicons/react/24/outline";
 
-export default function AssessmentLayout({ children }) {
+export default function AssessmentLayout({ children, activeTab: initialActiveTab = "assessment" }) {
 	const { user: authUser, loading: authLoading, signOut } = useAuth();
 	const [user, setUser] = useState(null);
-	const [activeTab, setActiveTab] = useState("assessment");
+	const [activeTab, setActiveTab] = useState(initialActiveTab);
 	const [isLoading, setIsLoading] = useState(true);
 	const [sidebarOpen, setSidebarOpen] = useState(true);
 	const router = useRouter();
@@ -102,7 +101,6 @@ export default function AssessmentLayout({ children }) {
 					setActiveTab={handleTabChange}
 					ChartBarIcon={ChartBarIcon}
 					ChatBubbleLeftRightIcon={ChatBubbleLeftRightIcon}
-					PlayCircleIcon={PlayCircleIcon}
 					BriefcaseIcon={BriefcaseIcon}
 					ArrowTrendingUpIcon={ArrowTrendingUpIcon}
 					onProfileClick={handleProfileClick}
@@ -111,10 +109,9 @@ export default function AssessmentLayout({ children }) {
 
 				{/* Main Content */}
 				<div
-					className={`flex-1 transition-all duration-300 ease-in-out ${sidebarOpen ? "ml-72" : "ml-16"
-						}`}
+					className={`assessment-workspace transition-all duration-300 ease-in-out ${sidebarOpen ? "sidebar-open" : "sidebar-collapsed"}`}
 				>
-					<div className="min-h-screen py-8 px-6">
+					<div className="assessment-workspace-inner">
 						{children}
 					</div>
 				</div>

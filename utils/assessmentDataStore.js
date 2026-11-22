@@ -60,7 +60,9 @@ export class AssessmentDataStore {
         const totalQuestions = this.sessionData.responses.length;
         const correctAnswers = this.sessionData.responses.filter(r => r.isCorrect).length;
         const score = Math.round((correctAnswers / totalQuestions) * 100);
-        const totalTime = Math.floor((new Date() - this.sessionData.startTime) / 1000);
+        const totalTime = this.sessionData.startTime
+            ? Math.max(0, Math.floor((new Date() - this.sessionData.startTime) / 1000))
+            : 0;
 
         // Determine level based on score
         let level = 'Beginner';
@@ -87,7 +89,51 @@ export class AssessmentDataStore {
                 .select()
                 .single();
 
-            if (resultError) throw resultError;
+            if (resultError) {
+                const localRecord = {
+                    id: `local-${Date.now()}`,
+                    user_id: userId,
+                    assessment_type: this.sessionData.assessmentType,
+                    job_role: this.sessionData.jobRole,
+                    score,
+                    level,
+                    number_of_questions: totalQuestions,
+                    correct_answers: correctAnswers,
+                    time_taken: totalTime,
+                    questions_data: this.sessionData.responses,
+                    completed_at: new Date().toISOString(),
+                    stored_locally: true,
+                };
+                saveLocalAssessmentResult(userId, localRecord);
+                console.warn('Assessment saved locally because Supabase storage failed:', resultError.message);
+
+                const completedAssessmentType = this.sessionData.assessmentType;
+                this.sessionData = {
+                    startTime: null,
+                    responses: [],
+                    jobRole: null,
+                    assessmentType: null
+                };
+
+                if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('talento:assessment-completed', {
+                        detail: { assessmentType: completedAssessmentType, score, level }
+                    }));
+                }
+
+                return {
+                    success: true,
+                    data: localRecord,
+                    score,
+                    level,
+                    totalQuestions,
+                    correctAnswers,
+                    totalTime,
+                    storedLocally: true,
+                };
+            }
+
+            const completedAssessmentType = this.sessionData.assessmentType;
 
             // Reset session
             this.sessionData = {
@@ -96,6 +142,16 @@ export class AssessmentDataStore {
                 jobRole: null,
                 assessmentType: null
             };
+
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('talento:assessment-completed', {
+                    detail: {
+                        assessmentType: completedAssessmentType,
+                        score,
+                        level,
+                    }
+                }));
+            }
 
             return {
                 success: true,
@@ -127,18 +183,61 @@ export class AssessmentDataStore {
     }
 }
 
-// Helper functions for simple assessment data retrieval
-export async function getUserAssessmentResults(userId) {
-    const supabase = createClientForBrowser();
+const LOCAL_ASSESSMENT_KEY = 'talento:assessment-results';
 
+function getLocalAssessmentResults(userId) {
+    if (typeof window === 'undefined') return [];
+
+    try {
+        const allResults = JSON.parse(localStorage.getItem(LOCAL_ASSESSMENT_KEY) || '{}');
+        return Array.isArray(allResults[userId]) ? allResults[userId] : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveLocalAssessmentResult(userId, result) {
+    if (typeof window === 'undefined') return;
+
+    try {
+        const allResults = JSON.parse(localStorage.getItem(LOCAL_ASSESSMENT_KEY) || '{}');
+        const userResults = Array.isArray(allResults[userId]) ? allResults[userId] : [];
+        allResults[userId] = [result, ...userResults].slice(0, 100);
+        localStorage.setItem(LOCAL_ASSESSMENT_KEY, JSON.stringify(allResults));
+    } catch (error) {
+        console.error('Could not save assessment locally:', error);
+    }
+}
+
+export function getStoredAssessmentResults(userId) {
+    return getLocalAssessmentResults(userId);
+}
+
+export async function getMergedAssessmentResults(userId) {
+    const supabase = createClientForBrowser();
     const { data, error } = await supabase
         .from('assessment_results')
         .select('*')
         .eq('user_id', userId)
         .order('completed_at', { ascending: false });
 
-    if (error) throw error;
-    return data || [];
+    const remoteResults = !error && Array.isArray(data) ? data : [];
+    const localResults = getLocalAssessmentResults(userId);
+    const merged = new Map();
+
+    [...remoteResults, ...localResults].forEach((result) => {
+        const key = `${result.assessment_type || result.assessmentType || 'unknown'}:${result.completed_at || result.created_at || result.id || ''}`;
+        if (!merged.has(key)) merged.set(key, result);
+    });
+
+    return Array.from(merged.values()).sort((a, b) =>
+        new Date(b.completed_at || b.created_at || 0) - new Date(a.completed_at || a.created_at || 0)
+    );
+}
+
+// Helper functions for simple assessment data retrieval
+export async function getUserAssessmentResults(userId) {
+    return await getMergedAssessmentResults(userId);
 }
 
 export async function getUserProgress(userId) {
@@ -163,7 +262,7 @@ export async function getAssessmentStats(userId) {
         .select('assessment_type, job_role, score, level, number_of_questions, correct_answers, completed_at')
         .eq('user_id', userId);
 
-    if (resultError) throw resultError;
+    const mergedResults = await getMergedAssessmentResults(userId);
 
     // Get progress data
     const { data: progress, error: progressError } = await supabase
@@ -174,8 +273,8 @@ export async function getAssessmentStats(userId) {
     if (progressError) throw progressError;
 
     return {
-        results: results || [],
-        progress: progress || []
+        results: mergedResults,
+        progress: progressError ? [] : (progress || [])
     };
 }
 
@@ -211,7 +310,44 @@ export async function storeAssessmentResult({
         .select()
         .single();
 
-    if (error) throw error;
+    if (error) {
+        const localRecord = {
+            id: `local-${Date.now()}`,
+            user_id: userId,
+            assessment_type: assessmentType,
+            job_role: jobRole,
+            score,
+            level,
+            number_of_questions: numQuestions,
+            correct_answers: correctAnswers,
+            questions_data: responses,
+            completed_at: new Date().toISOString(),
+            stored_locally: true,
+        };
+        saveLocalAssessmentResult(userId, localRecord);
+
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('talento:assessment-completed', {
+                detail: { assessmentType, score, level }
+            }));
+        }
+
+        return {
+            success: true,
+            data: localRecord,
+            score,
+            level,
+            correctAnswers,
+            totalQuestions: numQuestions,
+            storedLocally: true,
+        };
+    }
+
+    if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('talento:assessment-completed', {
+            detail: { assessmentType, score, level }
+        }));
+    }
 
     return {
         success: true,

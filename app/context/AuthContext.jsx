@@ -2,6 +2,20 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import createClientForBrowser from '../../utils/supabase/client';
 
+const isDemoModeEnabled = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+
+const createDemoUser = () => ({
+    id: 'demo-user',
+    email: 'demo@talentoai.local',
+    email_confirmed_at: new Date().toISOString(),
+    user_metadata: {
+        name: 'Demo User',
+        firstName: 'Demo',
+        onboarded: true,
+        role: 'user',
+    },
+});
+
 const AuthContext = createContext({});
 
 export const useAuth = () => {
@@ -26,6 +40,10 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         setIsClient(true);
+    }, []);
+
+    useEffect(() => {
+        setLoading(false);
     }, []);
 
     const getUser = async (forceRefresh = false) => {
@@ -151,7 +169,8 @@ export const AuthProvider = ({ children }) => {
         refreshUser,
         signOut,
         updateUser,
-        supabase
+        supabase,
+        isDemoMode: isDemoModeEnabled,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

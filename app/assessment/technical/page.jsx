@@ -353,6 +353,7 @@ export default function TechnicalAssessmentPage() {
 		};
 
 		// Navigate to results page with data
+		sessionStorage.setItem('talento:last-assessment-results', JSON.stringify(resultsData));
 		const resultsParam = encodeURIComponent(JSON.stringify(resultsData));
 		router.push(`/assessment/results?data=${resultsParam}`);
 	};
@@ -397,7 +398,7 @@ export default function TechnicalAssessmentPage() {
 				>
 					<div className="flex items-center justify-center mb-4">
 						<CodeBracketIcon className="h-8 w-8 text-cyan-400 mr-3" />
-						<h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
+						<h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-slate-400 to-teal-700 bg-clip-text text-transparent">
 							Technical Assessment
 						</h1>
 					</div>
@@ -501,7 +502,7 @@ export default function TechnicalAssessmentPage() {
 							</div>
 							<div className="w-full bg-gray-700 rounded-full h-2">
 								<div
-									className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full transition-all duration-300"
+									className="bg-gradient-to-r from-cyan-400 to-teal-600 h-2 rounded-full transition-all duration-300"
 									style={{
 										width: `${((currentQuestion + 1) / questions.length) * 100
 											}%`,
@@ -554,7 +555,7 @@ export default function TechnicalAssessmentPage() {
 								<button
 									onClick={() => setCurrentQuestion(currentQuestion + 1)}
 									disabled={userAnswers[currentQuestion] === null}
-									className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+									className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-teal-700 text-white rounded-lg hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
 								>
 									Next
 								</button>
@@ -562,7 +563,7 @@ export default function TechnicalAssessmentPage() {
 								<button
 									onClick={handleSubmit}
 									disabled={userAnswers.some((ans) => ans === null)}
-									className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+									className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-teal-700 text-white rounded-lg hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
 								>
 									Submit Test
 								</button>

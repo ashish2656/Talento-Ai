@@ -107,7 +107,7 @@ export default function OnboardingPage() {
     // Insert into Supabase
     const { error: insertError } = await supabase
       .from('user_onboarding')
-      .insert([payload]);
+      .upsert([payload], { onConflict: 'user_id' });
 
     if (insertError) {
       alert('Error saving onboarding data: ' + insertError.message);

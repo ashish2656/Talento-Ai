@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
+import { getSupabaseConfig } from "@/utils/supabase/env";
 
 export async function POST(req) {
 	try {
@@ -61,8 +62,7 @@ export async function POST(req) {
 		}
 
 		// Fallback Method: Use Supabase Storage (original code)
-		const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-		const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+		const { supabaseUrl, supabaseKey: anonKey } = getSupabaseConfig();
 		const serviceRoleKey =
 			process.env.SUPABASE_SERVICE_ROLE_KEY ||
 			process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY;
@@ -123,22 +123,31 @@ export async function POST(req) {
 			},
 		});
 
-		// Ensure bucket exists (create if missing)
+		// Ensure the canonical private bucket exists (create if missing)
 		try {
 			const { data: bucketData, error: bucketError } =
-				await serviceClient.storage.getBucket("resume");
+				await serviceClient.storage.getBucket("resumes");
 			if (bucketError || !bucketData) {
-				await serviceClient.storage.createBucket("resume", { public: true });
+				await serviceClient.storage.createBucket("resumes", {
+					public: false,
+					fileSizeLimit: 10 * 1024 * 1024,
+					allowedMimeTypes: [
+						"application/pdf",
+						"application/msword",
+						"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+						"text/plain",
+					],
+				});
 			}
 		} catch (_) {
-			// ignore if bucket already exists or creation fails due to race; subsequent upload will surface errors
+			// The upload below reports a precise storage error if bucket creation is not permitted.
 		}
 
 		const arrayBuffer = await file.arrayBuffer();
 		const fileBuffer = Buffer.from(arrayBuffer);
 
 		const { error: uploadError } = await serviceClient.storage
-			.from("resume")
+			.from("resumes")
 			.upload(filePath, fileBuffer, {
 				upsert: true,
 				contentType: file.type || "application/octet-stream",
@@ -152,18 +161,19 @@ export async function POST(req) {
 		}
 
 		const { data: publicUrlData } = serviceClient.storage
-			.from("resume")
+			.from("resumes")
 			.getPublicUrl(filePath);
 
 		const { error: insertError } = await serviceClient
-			.from("user_resume")
+			.from("resumes")
 			.insert([
 				{
 					user_id: user.id,
-					file_url: publicUrlData.publicUrl,
-					uploaded_at: new Date().toISOString(),
-					is_active: true,
-					analysis_output: null,
+					filename: filePath,
+					original_name: file.name,
+					file_size: file.size,
+					file_type: file.type,
+					content: null,
 				},
 			]);
 

@@ -1,12 +1,19 @@
 import Razorpay from 'razorpay';
 
 const razorpay = new Razorpay({
-  key_id: 'rzp_test_R800nyYb6EHdmN',
-  key_secret: 'AmyIQT0BdBaQLIzT7r0cwNg5',
+  key_id: process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
 export async function POST(request) {
   try {
+    if (!process.env.RAZORPAY_KEY_SECRET) {
+      return Response.json(
+        { success: false, error: 'Razorpay credentials are not configured' },
+        { status: 500 }
+      );
+    }
+
     const { amount, currency = 'INR' } = await request.json();
 
     const options = {

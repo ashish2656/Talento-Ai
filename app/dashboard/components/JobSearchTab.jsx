@@ -13,6 +13,7 @@ export default function JobSearchTab() {
 	const [query, setQuery] = useState("");
 	const [location, setLocation] = useState("");
 	const [results, setResults] = useState([]);
+	const [hasSearched, setHasSearched] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
@@ -153,6 +154,7 @@ export default function JobSearchTab() {
 		if (!q.trim() && !l.trim()) return;
 
 		setLoading(true);
+		setHasSearched(true);
 		setError(null);
 		setResults([]);
 		setSupabaseError(""); // Clear any previous save errors
@@ -184,7 +186,7 @@ export default function JobSearchTab() {
 			}
 		} catch (err) {
 			console.error("Search error:", err);
-			setError("Failed to connect to server.");
+			setError(err instanceof Error ? err.message : "Failed to connect to server.");
 			setResults([]);
 		} finally {
 			setLoading(false);
@@ -361,64 +363,61 @@ export default function JobSearchTab() {
 		: popularLocations;
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-			<div className="container mx-auto px-6 py-8 space-y-8 max-w-7xl">
-				{/* Animated background */}
-				<div className="fixed inset-0 overflow-hidden pointer-events-none">
-					<div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-full blur-3xl animate-pulse"></div>
-					<div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-purple-500/10 to-pink-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-				</div>
-
+		<div className="job-search-page">
+			<div className="job-search-content">
 				{/* Header */}
-				<div className="relative z-10 bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-8 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300">
-					<div className="flex items-center space-x-4">
-						<div className="p-3 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl">
-							<BriefcaseIcon className="h-8 w-8 text-white" />
+				<div className="job-search-header">
+					<div className="job-search-heading">
+						<div className="job-search-icon">
+							<BriefcaseIcon />
 						</div>
 						<div>
-							<h2 className="text-3xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent tracking-tight">Job Search</h2>
-							<p className="text-gray-400 text-lg font-medium">Find your next opportunity. Search for jobs by title, keyword, or location.</p>
+							<span className="job-search-eyebrow">OPPORTUNITIES</span>
+							<h2>Find your next opportunity</h2>
+							<p>Search remote roles by title, skill, location, and employment type.</p>
 						</div>
 					</div>
 				</div>
 
-				<div className="relative z-10 flex gap-6 mb-8">
+				<div className="job-search-tabs" role="tablist" aria-label="Job listings">
 					<button
+						type="button"
+						role="tab"
+						aria-selected={activeJobTab === "search"}
 						onClick={() => setActiveJobTab("search")}
-						className={`group px-8 py-4 rounded-2xl font-bold transition-all duration-300 hover:scale-105 hover:shadow-lg ${activeJobTab === "search"
-							? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25"
-							: "bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 text-gray-300 hover:bg-gray-700/40 hover:text-white hover:shadow-cyan-500/10"
-							}`}
+						className={activeJobTab === "search" ? "active" : ""}
 					>
 						Search Jobs
 					</button>
 					<button
+						type="button"
+						role="tab"
+						aria-selected={activeJobTab === "saved"}
 						onClick={() => setActiveJobTab("saved")}
-						className={`group px-8 py-4 rounded-2xl font-bold transition-all duration-300 hover:scale-105 hover:shadow-lg ${activeJobTab === "saved"
-							? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25"
-							: "bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 text-gray-300 hover:bg-gray-700/40 hover:text-white hover:shadow-cyan-500/10"
-							}`}
+						className={activeJobTab === "saved" ? "active" : ""}
 					>
-						Saved Jobs
+						Saved Jobs{savedJobs.length > 0 && <span>{savedJobs.length}</span>}
 					</button>
 				</div>
 				{activeJobTab === "search" && (
 					<>
-						<div className="relative z-10 bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-8 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300">
+						<div className="job-search-panel">
 							<form
 								onSubmit={handleSearch}
-								className="flex flex-col md:flex-row gap-6 mb-6"
+								className="job-search-form"
 							>
 								<input
 									type="text"
+									aria-label="Job title or keywords"
 									placeholder="Job title or keywords"
 									value={query}
 									onChange={(e) => setQuery(e.target.value)}
-									className="flex-1 px-6 py-4 rounded-xl border border-gray-600/30 bg-gray-700/30 backdrop-blur-sm text-white placeholder-gray-400 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300"
+									className="job-search-field"
 								/>
-								<div className="relative flex-1">
+								<div className="relative">
 									<input
 										type="text"
+										aria-label="Location"
 										placeholder="Location (optional)"
 										value={location}
 										onChange={(e) => {
@@ -429,11 +428,11 @@ export default function JobSearchTab() {
 										onBlur={() =>
 											setTimeout(() => setShowLocationSuggestions(false), 150)
 										}
-										className="w-full px-6 py-4 rounded-xl border border-gray-600/30 bg-gray-700/30 backdrop-blur-sm text-white placeholder-gray-400 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300"
+										className="job-search-field w-full"
 									/>
 									{showLocationSuggestions &&
 										filteredLocationSuggestions.length > 0 && (
-											<ul className="absolute left-0 right-0 bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-xl z-10 max-h-40 overflow-y-auto">
+											<ul className="job-search-dropdown absolute left-0 right-0 z-20 max-h-48 overflow-y-auto">
 												{filteredLocationSuggestions.map((loc, idx) => (
 													<li
 														key={loc}
@@ -441,7 +440,7 @@ export default function JobSearchTab() {
 															setLocation(loc);
 															setShowLocationSuggestions(false);
 														}}
-														className="px-4 py-2 cursor-pointer hover:bg-cyan-900/50 text-white"
+														className="cursor-pointer"
 													>
 														{loc}
 													</li>
@@ -450,11 +449,11 @@ export default function JobSearchTab() {
 										)}
 								</div>
 								{/* Multi-select categories */}
-								<div className="relative flex-1" ref={categoryDropdownRef}>
+								<div className="relative" ref={categoryDropdownRef}>
 									<button
 										type="button"
 										onClick={() => setShowCategoryDropdown((v) => !v)}
-										className="w-full px-4 py-2 rounded border border-cyan-900 bg-cyan-100 text-black text-left font-sans"
+										className="job-search-filter"
 									>
 										{selectedCategories.length === 0
 											? "All Categories"
@@ -466,11 +465,11 @@ export default function JobSearchTab() {
 												.join(", ")}
 									</button>
 									{showCategoryDropdown && (
-										<ul className="absolute left-0 right-0 bg-white border border-cyan-900 rounded shadow z-10 max-h-48 overflow-y-auto p-2">
+										<ul className="job-search-dropdown absolute left-0 right-0 z-20 max-h-48 overflow-y-auto p-2">
 											{categories.map((cat) => (
 												<li
 													key={cat.slug}
-													className="flex items-center gap-2 px-2 py-1 hover:bg-cyan-50 rounded cursor-pointer"
+													className="job-search-dropdown-option"
 												>
 													<input
 														type="checkbox"
@@ -484,11 +483,11 @@ export default function JobSearchTab() {
 									)}
 								</div>
 								{/* Multi-select job types */}
-								<div className="relative flex-1" ref={jobTypeDropdownRef}>
+								<div className="relative" ref={jobTypeDropdownRef}>
 									<button
 										type="button"
 										onClick={() => setShowJobTypeDropdown((v) => !v)}
-										className="w-full px-4 py-2 rounded border border-cyan-900 bg-cyan-100 text-black text-left font-sans"
+										className="job-search-filter"
 									>
 										{selectedJobTypes.length === 0
 											? "All Job Types"
@@ -500,11 +499,11 @@ export default function JobSearchTab() {
 												.join(", ")}
 									</button>
 									{showJobTypeDropdown && (
-										<ul className="absolute left-0 right-0 bg-white border border-cyan-900 rounded shadow z-10 max-h-48 overflow-y-auto p-2">
+										<ul className="job-search-dropdown absolute left-0 right-0 z-20 max-h-48 overflow-y-auto p-2">
 											{jobTypes.map((jt) => (
 												<li
 													key={jt.value}
-													className="flex items-center gap-2 px-2 py-1 hover:bg-cyan-50 rounded cursor-pointer"
+													className="job-search-dropdown-option"
 												>
 													<input
 														type="checkbox"
@@ -519,7 +518,7 @@ export default function JobSearchTab() {
 								</div>
 								<button
 									type="submit"
-									className="group px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-bold hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+									className="job-search-submit"
 									disabled={loading}
 								>
 									{loading ? "Searching..." : "Search"}
@@ -528,9 +527,9 @@ export default function JobSearchTab() {
 						</div>
 
 
-						{error && <div className="text-red-400 font-sans mb-4">{error}</div>}
-						{supabaseError && <div className="text-red-400 font-sans mb-4">{supabaseError}</div>}
-						{supabaseSuccess && <div className="text-green-400 font-sans mb-4">{supabaseSuccess}</div>}
+						{error && <div className="job-search-message error" role="alert">{error}</div>}
+						{supabaseError && <div className="job-search-message error" role="alert">{supabaseError}</div>}
+						{supabaseSuccess && <div className="job-search-message success" role="status">{supabaseSuccess}</div>}
 						<div>
 							{loading && (
 								<motion.div
@@ -544,20 +543,31 @@ export default function JobSearchTab() {
 									</div>
 								</motion.div>
 							)}
-							{!loading && results.length === 0 && (
+							{!loading && hasSearched && results.length === 0 && !error && (
 								<motion.div
 									initial={{ opacity: 0, y: 20 }}
 									animate={{ opacity: 1, y: 0 }}
-									className="text-center py-16"
+									className="job-search-empty"
 								>
 									<BriefcaseIcon className="w-16 h-16 text-gray-500 mx-auto mb-4" />
 									<p className="text-gray-400 text-lg font-medium mb-2">No jobs found</p>
 									<p className="text-gray-500">Try adjusting your search terms or location</p>
 								</motion.div>
 							)}
+							{!loading && !hasSearched && (
+								<div className="job-search-empty">
+									<BriefcaseIcon className="w-12 h-12 text-cyan-400 mx-auto mb-3" />
+									<p className="text-gray-200 text-base font-semibold mb-1">Start with a role or skill</p>
+									<p className="text-gray-500 text-sm">Add a keyword or location above to see matching opportunities.</p>
+								</div>
+							)}
 							{results.length > 0 && (
 								<>
-									<ul className="space-y-4">
+									<div className="job-results-heading">
+										<strong>{results.length} opportunities</strong>
+										<span>Remote roles from Remotive</span>
+									</div>
+									<ul className="job-results-grid">
 										{results.map((job, idx) => (
 											<motion.li
 												key={idx}
@@ -570,25 +580,25 @@ export default function JobSearchTab() {
 													damping: 25,
 													stiffness: 120
 												}}
-												className="group relative bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-xl border border-gray-600/40 rounded-2xl p-6 hover:border-cyan-400/30 hover:shadow-2xl hover:shadow-cyan-500/5 transition-all duration-500 cursor-pointer overflow-hidden"
+												className="job-result-card group relative"
 											>
 												{/* Subtle background gradient on hover */}
-												<div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+												<div className="job-result-hover" />
 
 												<div className="relative z-10">
-													<div className="flex items-start justify-between mb-4">
+													<div className="job-result-header">
 														<div className="flex-1">
-															<h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors duration-300">
+															<h3 className="job-result-title">
 																{job.title}
 															</h3>
-															<div className="flex items-center gap-2 text-gray-400 mb-2">
+															<div className="job-result-meta">
 																<span className="font-semibold text-gray-300">{job.company}</span>
 																<span>•</span>
 																<span className="text-cyan-400">{job.location}</span>
 																{job.job_type && (
 																	<>
 																		<span>•</span>
-																		<span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium">
+																		<span className="px-2 py-1 bg-cyan-600/20 text-cyan-300 rounded-full text-xs font-medium">
 																			{job.job_type.replace("_", " ").toUpperCase()}
 																		</span>
 																	</>
@@ -602,24 +612,24 @@ export default function JobSearchTab() {
 																handleSaveJob(job);
 															}}
 															disabled={supabaseLoading}
-															className="px-4 py-2 bg-gray-700/50 hover:bg-cyan-600/80 text-gray-300 hover:text-white rounded-lg transition-all duration-300 text-sm font-medium hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+															className="job-save-button"
 														>
 															{supabaseLoading ? "Saving..." : "Save Job"}
 														</button>
 													</div>
 
-													<p className="text-gray-300 text-sm leading-relaxed mb-4 line-clamp-3">
+													<p className="job-result-description">
 														{job.description}
 													</p>
 
-													<div className="flex items-center justify-between">
+													<div className="job-result-footer">
 														<button
 															onClick={(e) => {
 																e.preventDefault();
 																setSelectedJob(job);
 																setShowJobModal(true);
 															}}
-															className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white rounded-xl font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25"
+															className="job-apply-button"
 														>
 															View Details & Apply
 														</button>
@@ -647,27 +657,35 @@ export default function JobSearchTab() {
 					</>
 				)}
 				{activeJobTab === "saved" && (
-					<div>
+					<div className="job-saved-panel">
+						<div className="job-results-heading">
+							<strong>Saved opportunities</strong>
+							<span>Keep track of roles you want to revisit.</span>
+						</div>
 						{supabaseLoading && (
-							<div className="text-cyan-400 font-sans">Loading saved jobs...</div>
+							<div className="job-search-empty">Loading saved jobs...</div>
 						)}
 						{supabaseError && (
-							<div className="text-red-400 font-sans mb-2">{supabaseError}</div>
+							<div className="job-search-message error" role="alert">{supabaseError}</div>
 						)}
 						{!supabaseLoading && savedJobs.length === 0 && !supabaseError && (
-							<div className="text-gray-400 font-sans">No saved jobs yet.</div>
+							<div className="job-search-empty">
+								<BriefcaseIcon className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+								<p className="text-gray-200 text-base font-semibold mb-1">No saved jobs yet</p>
+								<p className="text-gray-500 text-sm">Save a role from your search results and it will appear here.</p>
+							</div>
 						)}
 						{!supabaseLoading && savedJobs.length > 0 && (
 							<ul className="space-y-4">
 								{savedJobs.map((row, idx) => (
 									<li
 										key={row.id || idx}
-										className="group bg-gray-800/40 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 hover:bg-gray-700/40 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 cursor-pointer"
+										className="job-result-card saved-job-card"
 									>
 										<h3 className="text-lg font-semibold text-white">
 											{row.job_data?.title}
 										</h3>
-										<p className="text-gray-300">
+										<p className="text-gray-300 text-sm">
 											{row.job_data?.company} - {row.job_data?.location}
 										</p>
 										<p className="text-gray-400 text-sm mb-2">
@@ -713,8 +731,8 @@ export default function JobSearchTab() {
 				)}
 				{/* Job Details Modal */}
 				{showJobModal && selectedJob && (
-					<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-						<div className="bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg max-w-2xl w-full p-6 relative border border-gray-600/50">
+					<div className="job-details-overlay">
+						<div className="job-details-modal">
 							<button
 								onClick={() => setShowJobModal(false)}
 								className="absolute top-2 right-2 text-gray-400 hover:text-cyan-400 text-2xl font-bold"

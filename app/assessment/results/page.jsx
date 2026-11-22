@@ -16,7 +16,6 @@ import {
 	CodeBracketIcon,
 	ChatBubbleLeftRightIcon,
 	BriefcaseIcon,
-	PlayCircleIcon,
 	ArrowTrendingUpIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -39,14 +38,28 @@ function AssessmentResultsContent() {
 		const resultsParam = searchParams.get('data');
 		if (resultsParam) {
 			try {
-				const parsedResults = JSON.parse(decodeURIComponent(resultsParam));
+				let parsedResults;
+				try {
+					parsedResults = JSON.parse(resultsParam);
+				} catch {
+					parsedResults = JSON.parse(decodeURIComponent(resultsParam));
+				}
 				setResults(parsedResults);
 			} catch (error) {
 				console.error('Failed to parse results:', error);
-				router.push('/dashboard?tab=assessment');
+				setResults(null);
 			}
 		} else {
-			router.push('/dashboard?tab=assessment');
+			try {
+				const storedResults = sessionStorage.getItem('talento:last-assessment-results');
+				if (storedResults) {
+					setResults(JSON.parse(storedResults));
+				} else {
+					router.push('/dashboard?tab=assessment');
+				}
+			} catch {
+				router.push('/dashboard?tab=assessment');
+			}
 		}
 		setLoading(false);
 	}, [searchParams, router]);
@@ -123,7 +136,7 @@ function AssessmentResultsContent() {
 
 	if (loading) {
 		return (
-			<div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
+			<div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-900 to-slate-900 flex items-center justify-center">
 				<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-cyan-400"></div>
 			</div>
 		);
@@ -131,12 +144,12 @@ function AssessmentResultsContent() {
 
 	if (!results) {
 		return (
-			<div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
+			<div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-900 to-slate-900 flex items-center justify-center">
 				<div className="text-center">
 					<p className="text-white text-xl mb-4">No results found</p>
 					<Link
 						href="/dashboard?tab=assessment"
-						className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 inline-flex items-center gap-2"
+						className="bg-gradient-to-r from-cyan-500 to-teal-700 text-white px-6 py-3 rounded-lg hover:from-cyan-600 hover:to-slate-700 transition-all duration-200 inline-flex items-center gap-2"
 					>
 						<ArrowLeftIcon className="h-5 w-5" />
 						Go to Assessment Tab
@@ -151,8 +164,8 @@ function AssessmentResultsContent() {
 
 	if (!user) {
 		return (
-			<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
-				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+			<div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
 			</div>
 		);
 	}
@@ -168,7 +181,6 @@ function AssessmentResultsContent() {
 				setActiveTab={handleTabChange}
 				ChartBarIcon={ChartBarIcon}
 				ChatBubbleLeftRightIcon={ChatBubbleLeftRightIcon}
-				PlayCircleIcon={PlayCircleIcon}
 				BriefcaseIcon={BriefcaseIcon}
 				ArrowTrendingUpIcon={ArrowTrendingUpIcon}
 				onProfileClick={handleProfileClick}
@@ -210,7 +222,7 @@ function AssessmentResultsContent() {
 									initial={{ scale: 0 }}
 									animate={{ scale: 1 }}
 									transition={{ delay: 0.3, type: "spring", stiffness: 150 }}
-									className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center"
+									className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-500 to-teal-700 flex items-center justify-center"
 								>
 									{React.createElement(getAssessmentIcon(results.assessmentType), {
 										className: "w-12 h-12 text-white"
@@ -266,7 +278,7 @@ function AssessmentResultsContent() {
 									className="bg-gradient-to-br from-gray-700/30 to-gray-800/30 rounded-2xl p-6 text-center"
 								>
 									<div className="flex items-center justify-center mb-2">
-										<ClockIcon className="w-8 h-8 text-blue-400 mr-2" />
+										<ClockIcon className="w-8 h-8 text-cyan-400 mr-2" />
 										<span className="text-3xl font-bold text-white">
 											{results.totalTime || 'N/A'}
 										</span>
@@ -306,7 +318,7 @@ function AssessmentResultsContent() {
 								className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl rounded-3xl border border-gray-700/50 p-8 mb-8"
 							>
 								<div className="flex items-center mb-6">
-									<UserIcon className="w-8 h-8 text-purple-400 mr-3" />
+									<UserIcon className="w-8 h-8 text-amber-400 mr-3" />
 									<h2 className="text-2xl font-bold text-white">Personality Analysis</h2>
 								</div>
 
@@ -321,14 +333,14 @@ function AssessmentResultsContent() {
 														<div key={trait}>
 															<div className="flex justify-between mb-1">
 																<span className="text-gray-300 text-sm">{trait}</span>
-																<span className="text-purple-400 text-sm font-medium">{percentage}%</span>
+																<span className="text-amber-400 text-sm font-medium">{percentage}%</span>
 															</div>
 															<div className="bg-gray-600 rounded-full h-2">
 																<motion.div
 																	initial={{ width: 0 }}
 																	animate={{ width: `${percentage}%` }}
 																	transition={{ delay: 1, duration: 0.8 }}
-																	className="h-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
+																	className="h-2 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600"
 																/>
 															</div>
 														</div>
@@ -432,8 +444,8 @@ function AssessmentResultsContent() {
 													</div>
 												) : (
 													/* Open-ended question display for communication assessment */
-													<div className="bg-gradient-to-br from-blue-900/20 to-cyan-900/20 border border-blue-500/30 rounded-lg p-4 mb-4">
-														<h4 className="text-blue-400 text-sm font-medium mb-2">Your Response:</h4>
+													<div className="bg-gradient-to-br from-slate-800/20 to-cyan-900/20 border border-cyan-500/30 rounded-lg p-4 mb-4">
+														<h4 className="text-cyan-400 text-sm font-medium mb-2">Your Response:</h4>
 														<p className="text-gray-200 leading-relaxed">
 															{item.userAnswer || "No response provided"}
 														</p>
@@ -474,7 +486,7 @@ function AssessmentResultsContent() {
 									whileHover={{ scale: 1.05 }}
 									whileTap={{ scale: 0.95 }}
 									onClick={() => router.push('/dashboard?tab=assessment')}
-									className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-10 py-4 rounded-2xl font-semibold hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-cyan-500/25"
+									className="bg-gradient-to-r from-cyan-500 to-teal-700 text-white px-10 py-4 rounded-2xl font-semibold hover:from-cyan-600 hover:to-slate-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-cyan-500/25"
 								>
 									<AcademicCapIcon className="w-6 h-6 mr-3" />
 									<div className="text-left">
@@ -486,7 +498,7 @@ function AssessmentResultsContent() {
 									whileHover={{ scale: 1.05 }}
 									whileTap={{ scale: 0.95 }}
 									onClick={() => router.push('/dashboard?tab=progress')}
-									className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-10 py-4 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-purple-500/25"
+									className="bg-gradient-to-r from-emerald-500 to-emerald-700 text-white px-10 py-4 rounded-2xl font-semibold hover:from-emerald-600 hover:to-teal-700 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-emerald-500/25"
 								>
 									<ChartBarIcon className="w-6 h-6 mr-3" />
 									<div className="text-left">
@@ -508,8 +520,8 @@ export default function AssessmentResultsPage() {
 	return (
 		<Suspense
 			fallback={
-				<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
-					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+				<div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
 				</div>
 			}
 		>

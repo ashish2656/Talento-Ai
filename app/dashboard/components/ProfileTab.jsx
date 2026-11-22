@@ -321,7 +321,7 @@ export default function ProfileTab() {
                         <div className="flex flex-col lg:flex-row gap-8">
                             <div className="flex flex-col items-center">
                                 <div className="relative group">
-                                    <div className="w-48 h-48 rounded-full p-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 shadow-2xl">
+                                    <div className="w-48 h-48 rounded-full p-1 bg-gradient-to-r from-cyan-400 via-slate-400 to-teal-700 shadow-2xl">
                                         <div className="w-full h-full rounded-full overflow-hidden bg-gray-800 flex items-center justify-center relative">
                                             {profileImageUrl && !imageError ? (
                                                 <Image
@@ -332,7 +332,7 @@ export default function ProfileTab() {
                                                     onError={handleImageError}
                                                 />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-6xl font-bold text-white bg-gradient-to-br from-cyan-500 to-blue-700">
+                                                <div className="w-full h-full flex items-center justify-center text-6xl font-bold text-white bg-gradient-to-br from-cyan-500 to-slate-700">
                                                     {initials}
                                                 </div>
                                             )}

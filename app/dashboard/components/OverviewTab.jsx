@@ -12,6 +12,7 @@ import {
 } from "@heroicons/react/24/outline";
 import createClientForBrowser from '@/utils/supabase/client';
 import { saveResume, uploadResumeFile, extractTextFromFile, saveAnalysis } from '../../../utils/resumeStorage';
+import { getMergedAssessmentResults } from '../../../utils/assessmentDataStore';
 
 export default function OverviewTab({ user }) {
 	const [isDragOver, setIsDragOver] = useState(false);
@@ -99,8 +100,8 @@ export default function OverviewTab({ user }) {
 			let containerClass = "mb-8 p-6 rounded-xl border backdrop-blur-sm";
 
 			if (title.includes('🔍') || title.includes('EXTRACTED')) {
-				headerClass = "text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-6";
-				containerClass += " bg-blue-900/20 border-blue-500/40 shadow-lg shadow-blue-500/20";
+				headerClass = "text-2xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-400 bg-clip-text text-transparent mb-6";
+				containerClass += " bg-slate-800/20 border-cyan-500/40 shadow-lg shadow-cyan-500/20";
 			} else if (title.includes('✅') || title.includes('STRENGTHS')) {
 				headerClass = "text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-6";
 				containerClass += " bg-green-900/20 border-green-500/40 shadow-lg shadow-green-500/20";
@@ -108,14 +109,14 @@ export default function OverviewTab({ user }) {
 				headerClass = "text-2xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent mb-6";
 				containerClass += " bg-yellow-900/20 border-yellow-500/40 shadow-lg shadow-yellow-500/20";
 			} else if (title.includes('🚀') || title.includes('OPTIMIZATION')) {
-				headerClass = "text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-6";
-				containerClass += " bg-purple-900/20 border-purple-500/40 shadow-lg shadow-purple-500/20";
+				headerClass = "text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-6";
+				containerClass += " bg-slate-800/20 border-emerald-500/40 shadow-lg shadow-emerald-500/20";
 			} else if (title.includes('📈') || title.includes('ATS') || title.includes('SCORE')) {
-				headerClass = "text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-6";
-				containerClass += " bg-indigo-900/20 border-indigo-500/40 shadow-lg shadow-indigo-500/20";
+				headerClass = "text-2xl font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent mb-6";
+				containerClass += " bg-slate-800/20 border-cyan-600/40 shadow-lg shadow-cyan-500/20";
 			} else if (title.includes('🎯') || title.includes('NEXT STEPS')) {
-				headerClass = "text-2xl font-bold bg-gradient-to-r from-pink-400 to-red-400 bg-clip-text text-transparent mb-6";
-				containerClass += " bg-pink-900/20 border-pink-500/40 shadow-lg shadow-pink-500/20";
+				headerClass = "text-2xl font-bold bg-gradient-to-r from-amber-400 to-red-400 bg-clip-text text-transparent mb-6";
+				containerClass += " bg-slate-800/20 border-amber-500/40 shadow-lg shadow-amber-500/20";
 			} else if (title.includes('PRIORITY')) {
 				headerClass = "text-lg font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-4";
 				containerClass += " bg-orange-900/20 border-orange-500/40 shadow-lg shadow-orange-500/20";
@@ -320,11 +321,9 @@ export default function OverviewTab({ user }) {
 
 			if (!userData?.user) return;
 
-			// Get assessment results
-			const { data: assessmentResults, error: resultsError } = await supabase
-				.from('assessment_results')
-				.select('*')
-				.eq('user_id', userData.user.id);
+			// Use merged Supabase + local results so new projects work before SQL setup.
+			const assessmentResults = await getMergedAssessmentResults(userData.user.id);
+			const resultsError = null;
 
 			// Get user progress
 			const { data: progressData, error: progressError } = await supabase
@@ -404,6 +403,9 @@ export default function OverviewTab({ user }) {
 	// Load stats on component mount
 	useEffect(() => {
 		fetchUserStats();
+		const handleAssessmentCompleted = () => fetchUserStats();
+		window.addEventListener('talento:assessment-completed', handleAssessmentCompleted);
+		return () => window.removeEventListener('talento:assessment-completed', handleAssessmentCompleted);
 	}, []);
 
 	// Animated counter component
@@ -479,7 +481,7 @@ export default function OverviewTab({ user }) {
 					<div className="text-center">
 						{/* Enhanced Animated Icon */}
 						<motion.div
-							className="relative inline-flex items-center justify-center w-32 h-32 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-full mb-8 shadow-xl"
+							className="relative inline-flex items-center justify-center w-32 h-32 bg-gradient-to-br from-cyan-400 via-slate-400 to-teal-700 rounded-full mb-8 shadow-xl"
 							animate={{
 								rotate: 360,
 								scale: [1, 1.05, 1]
@@ -491,7 +493,7 @@ export default function OverviewTab({ user }) {
 						>
 							<SparklesIcon className="w-14 h-14 text-white" />
 							<motion.div
-								className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400/40 via-blue-500/40 to-purple-600/40"
+								className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400/40 via-slate-400/40 to-teal-700/40"
 								animate={{
 									scale: [1, 1.4, 1],
 									opacity: [0.6, 0, 0.6]
@@ -506,7 +508,7 @@ export default function OverviewTab({ user }) {
 						</motion.div>
 
 						{/* Title */}
-						<h3 className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-purple-600 bg-clip-text text-transparent mb-4">
+						<h3 className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-teal-700 bg-clip-text text-transparent mb-4">
 							Optimizing Your Resume
 						</h3>
 
@@ -537,7 +539,7 @@ export default function OverviewTab({ user }) {
 							</div>
 							<div className="relative w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
 								<motion.div
-									className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 h-full rounded-full relative"
+									className="bg-gradient-to-r from-cyan-400 via-slate-400 to-teal-700 h-full rounded-full relative"
 									initial={{ width: "0%" }}
 									animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
 									transition={{ duration: 0.8, ease: "easeOut" }}
@@ -556,7 +558,7 @@ export default function OverviewTab({ user }) {
 									<motion.div
 										key={index}
 										className={`w-3 h-3 rounded-full ${index <= currentStep
-												? 'bg-gradient-to-r from-cyan-400 to-purple-600'
+												? 'bg-gradient-to-r from-cyan-400 to-teal-700'
 												: 'bg-gray-300 dark:bg-gray-600'
 											}`}
 										animate={index === currentStep ? { scale: [1, 1.3, 1] } : {}}
@@ -661,8 +663,8 @@ export default function OverviewTab({ user }) {
 									/>
 									<defs>
 										<linearGradient id="atsGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-											<stop offset="0%" stopColor="rgb(168, 85, 247)" />
-											<stop offset="50%" stopColor="rgb(236, 72, 153)" />
+											<stop offset="0%" stopColor="rgb(20, 184, 166)" />
+											<stop offset="50%" stopColor="rgb(245, 158, 11)" />
 											<stop offset="100%" stopColor="rgb(249, 115, 22)" />
 										</linearGradient>
 									</defs>
@@ -670,7 +672,7 @@ export default function OverviewTab({ user }) {
 								<div className="absolute inset-0 flex items-center justify-center">
 									<div className="text-center">
 										<motion.span
-											className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
+											className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent"
 											animate={{ scale: [1, 1.05, 1] }}
 											transition={{ duration: 2, repeat: Infinity }}
 										>
@@ -683,7 +685,7 @@ export default function OverviewTab({ user }) {
 
 							{/* Floating Elements */}
 							<motion.div
-								className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center"
+								className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center"
 								animate={{
 									rotate: 360,
 									scale: [1, 1.2, 1]
@@ -698,7 +700,7 @@ export default function OverviewTab({ user }) {
 						</div>
 
 						{/* Title */}
-						<h3 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+						<h3 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent mb-4">
 							Calculating ATS Score
 						</h3>
 
@@ -729,7 +731,7 @@ export default function OverviewTab({ user }) {
 							</div>
 							<div className="relative w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
 								<motion.div
-									className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 h-full rounded-full relative"
+									className="bg-gradient-to-r from-emerald-500 via-amber-500 to-orange-500 h-full rounded-full relative"
 									initial={{ width: "0%" }}
 									animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
 									transition={{ duration: 0.8, ease: "easeOut" }}
@@ -748,7 +750,7 @@ export default function OverviewTab({ user }) {
 									<motion.div
 										key={index}
 										className={`w-3 h-3 rounded-full ${index <= currentStep
-												? 'bg-gradient-to-r from-purple-500 to-pink-500'
+												? 'bg-gradient-to-r from-emerald-500 to-emerald-600'
 												: 'bg-gray-300 dark:bg-gray-600'
 											}`}
 										animate={index === currentStep ? { scale: [1, 1.3, 1] } : {}}
@@ -969,17 +971,8 @@ export default function OverviewTab({ user }) {
 			{/* Toast Notifications */}
 			<Toast />
 
-			<div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black font-sans">
-				<div className="container mx-auto px-4 py-8">
-					<div className="max-w-7xl mx-auto">
-						<div className="mb-8">
-							<h2 className="text-3xl font-bold text-white mb-4 font-display">
-								Welcome back, {user.name}!
-							</h2>
-							<p className="text-gray-300 text-lg">
-								Here's your progress summary and recent activities.
-							</p>
-						</div>
+			<div className="premium-overview font-sans">
+				<div className="w-full">
 
 						{/* Stats Grid */}
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -988,7 +981,7 @@ export default function OverviewTab({ user }) {
 								Array(4).fill(0).map((_, idx) => (
 									<div
 										key={idx}
-										className="bg-gray-800/30 border border-gray-600/50 backdrop-blur-sm rounded-lg p-6 animate-pulse"
+										className="premium-stat-card premium-stat-skeleton animate-pulse"
 									>
 										<div className="flex items-center justify-between">
 											<div>
@@ -1007,11 +1000,19 @@ export default function OverviewTab({ user }) {
 										whileInView={{ opacity: 1, y: 0 }}
 										viewport={{ once: true, amount: 0.3 }}
 										transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
-										className="bg-gray-800/30 border border-gray-600/50 backdrop-blur-sm rounded-lg p-6 hover:border-cyan-400/50 transition-all duration-200"
+										className="premium-stat-card"
 									>
-										<div className="flex items-center justify-between">
+										<div className="premium-stat-topline">
+											<div className="premium-stat-icon" aria-hidden="true">{idx === 0 ? "◫" : idx === 1 ? "◇" : idx === 2 ? "◆" : "✦"}</div>
+											<div
+												className={`premium-stat-trend ${stat.changeType === "positive" ? "positive" : "negative"}`}
+											>
+												{stat.change}
+											</div>
+										</div>
+										<div className="premium-stat-body">
 											<div>
-												<p className="text-sm font-medium text-gray-300">{stat.name}</p>
+												<p className="premium-stat-label">{stat.name}</p>
 												<p className="text-2xl font-bold text-white">
 													<AnimatedCounter
 														targetValue={stat.targetValue}
@@ -1020,14 +1021,6 @@ export default function OverviewTab({ user }) {
 													/>
 												</p>
 											</div>
-											<div
-												className={`text-sm font-medium ${stat.changeType === "positive"
-													? "text-green-400"
-													: "text-red-400"
-													}`}
-											>
-												{stat.change}
-											</div>
 										</div>
 									</motion.div>
 								))
@@ -1035,20 +1028,21 @@ export default function OverviewTab({ user }) {
 						</div>
 
 						{/* Resume Upload Section */}
-						<div className="bg-gray-800/30 border border-gray-600/50 backdrop-blur-sm rounded-lg p-6 mb-8">
-							<h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-								📄 Upload Your Resume
-							</h3>
+						<div className="premium-resume-panel">
+							<div className="premium-section-heading">
+								<div>
+									<span className="premium-section-kicker">DOCUMENT STATION</span>
+									<h3>Upload Your Resume</h3>
+								</div>
+								<div className="premium-panel-status"><span /> Ready</div>
+							</div>
 
 							{!uploadedFile ? (
 								<div
 									onDragOver={handleDragOver}
 									onDragLeave={handleDragLeave}
 									onDrop={handleDrop}
-									className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ${isDragOver
-										? "border-cyan-400 bg-cyan-400/10"
-										: "border-gray-600/50 hover:border-cyan-400/50"
-										}`}
+									className={`premium-upload-zone ${isDragOver ? "is-dragging" : ""}`}
 									style={{ cursor: 'pointer' }}
 								>
 									<CloudArrowUpIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
@@ -1073,7 +1067,7 @@ export default function OverviewTab({ user }) {
 									</p>
 								</div>
 							) : (
-								<div className="bg-gray-800/50 rounded-lg p-4 border border-gray-600/50">
+								<div className="premium-uploaded-file">
 									<div className="flex items-center justify-between">
 										<div className="flex items-center space-x-3">
 											<DocumentTextIcon className="h-8 w-8 text-cyan-600 dark:text-cyan-400" />
@@ -1116,7 +1110,7 @@ export default function OverviewTab({ user }) {
 										value={jobRole}
 										onChange={(e) => setJobRole(e.target.value)}
 										placeholder="e.g., Software Engineer, Data Scientist"
-										className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+										className="premium-input"
 									/>
 								</div>
 							)}
@@ -1127,7 +1121,7 @@ export default function OverviewTab({ user }) {
 									<button
 										onClick={handleOptimizeResume}
 										disabled={isOptimizing}
-										className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg hover:from-cyan-700 hover:to-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+										className="premium-action-button premium-action-primary"
 									>
 										<SparklesIcon className="h-5 w-5 mr-2" />
 										{isOptimizing ? "Optimizing..." : "Optimize Resume"}
@@ -1135,7 +1129,7 @@ export default function OverviewTab({ user }) {
 									<button
 										onClick={handleFindAtsScore}
 										disabled={isScoring}
-										className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+										className="premium-action-button premium-action-secondary"
 									>
 										<ChartBarIcon className="h-5 w-5 mr-2" />
 										{isScoring ? "Calculating..." : "Find ATS Score"}
@@ -1157,7 +1151,7 @@ export default function OverviewTab({ user }) {
 											initial={{ opacity: 0, scale: 0.95 }}
 											animate={{ opacity: 1, scale: 1 }}
 											transition={{ duration: 0.5 }}
-											className="bg-gradient-to-br from-cyan-900/30 via-blue-900/20 to-cyan-800/30 border border-cyan-500/40 rounded-2xl p-8 shadow-2xl backdrop-blur-sm"
+											className="bg-gradient-to-br from-cyan-900/30 via-slate-900/20 to-cyan-800/30 border border-cyan-500/40 rounded-2xl p-8 shadow-2xl backdrop-blur-sm"
 										>
 											{/* Header with animated icon */}
 											<div className="flex items-center mb-6">
@@ -1165,14 +1159,14 @@ export default function OverviewTab({ user }) {
 													initial={{ rotate: 0 }}
 													animate={{ rotate: [0, 10, -10, 0] }}
 													transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-													className="bg-gradient-to-tr from-cyan-400 to-blue-500 rounded-xl p-3 mr-4"
+													className="bg-gradient-to-tr from-cyan-400 to-teal-600 rounded-xl p-3 mr-4"
 												>
 													<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
 													</svg>
 												</motion.div>
 												<div>
-													<h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+													<h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-500">
 														Resume Optimization Results
 													</h3>
 													<p className="text-gray-400 text-sm mt-1">AI-powered improvements for your resume</p>
@@ -1280,7 +1274,7 @@ export default function OverviewTab({ user }) {
 											initial={{ opacity: 0, scale: 0.95 }}
 											animate={{ opacity: 1, scale: 1 }}
 											transition={{ duration: 0.5, delay: 0.2 }}
-											className="bg-gradient-to-br from-purple-900/30 via-pink-900/20 to-purple-800/30 border border-purple-500/40 rounded-2xl p-8 shadow-2xl backdrop-blur-sm"
+											className="bg-gradient-to-br from-emerald-900/30 via-slate-800/20 to-slate-900/30 border border-emerald-500/40 rounded-2xl p-8 shadow-2xl backdrop-blur-sm"
 										>
 											{/* Header with animated score */}
 											<div className="flex items-center justify-between mb-6">
@@ -1289,14 +1283,14 @@ export default function OverviewTab({ user }) {
 														initial={{ scale: 0 }}
 														animate={{ scale: 1 }}
 														transition={{ duration: 0.5, type: "spring", bounce: 0.3 }}
-														className="bg-gradient-to-tr from-purple-400 to-pink-500 rounded-xl p-3 mr-4"
+														className="bg-gradient-to-tr from-emerald-400 to-emerald-600 rounded-xl p-3 mr-4"
 													>
 														<svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 															<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
 														</svg>
 													</motion.div>
 													<div>
-														<h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+														<h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">
 															ATS Score Analysis
 														</h3>
 														<p className="text-gray-400 text-sm mt-1">Applicant Tracking System compatibility</p>
@@ -1310,7 +1304,7 @@ export default function OverviewTab({ user }) {
 													transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
 													className="text-center"
 												>
-													<div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+													<div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">
 														{atsScoreResult?.score || atsScoreResult?.ats_score || '85'}%
 													</div>
 													<div className="text-sm text-gray-400">ATS Score</div>
@@ -1329,7 +1323,7 @@ export default function OverviewTab({ user }) {
 															{/* Handle structured ATS data */}
 															{atsScoreResult.score && (
 																<div className="text-center mb-6">
-																	<div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+																	<div className="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-2">
 																		{atsScoreResult.score}%
 																	</div>
 																	<p className="text-gray-400">Overall ATS Compatibility Score</p>
@@ -1338,13 +1332,13 @@ export default function OverviewTab({ user }) {
 
 															{atsScoreResult.breakdown && (
 																<div>
-																	<h4 className="text-lg font-semibold text-purple-400 mb-3">📊 Score Breakdown</h4>
+																	<h4 className="text-lg font-semibold text-amber-400 mb-3">📊 Score Breakdown</h4>
 																	<div className="grid grid-cols-2 gap-3">
 																		{Object.entries(atsScoreResult.breakdown).map(([category, score]) => (
 																			<div key={category} className="bg-gray-800/50 rounded-lg p-3">
 																				<div className="flex justify-between items-center">
 																					<span className="text-gray-300 capitalize">{category}</span>
-																					<span className="font-semibold text-purple-400">{score}%</span>
+																					<span className="font-semibold text-amber-400">{score}%</span>
 																				</div>
 																			</div>
 																		))}
@@ -1354,7 +1348,7 @@ export default function OverviewTab({ user }) {
 
 															{atsScoreResult.recommendations && (
 																<div>
-																	<h4 className="text-lg font-semibold text-purple-400 mb-3">💡 Recommendations</h4>
+																	<h4 className="text-lg font-semibold text-amber-400 mb-3">💡 Recommendations</h4>
 																	<div className="space-y-2">
 																		{atsScoreResult.recommendations.map((rec, index) => (
 																			<motion.div
@@ -1364,7 +1358,7 @@ export default function OverviewTab({ user }) {
 																				transition={{ delay: index * 0.1 }}
 																				className="flex items-start gap-2 text-gray-300"
 																			>
-																				<span className="text-purple-400 mt-1">•</span>
+																				<span className="text-amber-400 mt-1">•</span>
 																				<span>{rec}</span>
 																			</motion.div>
 																		))}
@@ -1387,9 +1381,9 @@ export default function OverviewTab({ user }) {
 											<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
 												{[
 													{ label: "Keywords", score: 92, color: "from-green-400 to-emerald-500" },
-													{ label: "Format", score: 88, color: "from-blue-400 to-cyan-500" },
+													{ label: "Format", score: 88, color: "from-cyan-400 to-cyan-500" },
 													{ label: "Structure", score: 79, color: "from-yellow-400 to-orange-500" },
-													{ label: "Content", score: 85, color: "from-purple-400 to-pink-500" }
+													{ label: "Content", score: 85, color: "from-emerald-400 to-emerald-600" }
 												].map((item, index) => (
 													<motion.div
 														key={item.label}
@@ -1409,7 +1403,7 @@ export default function OverviewTab({ user }) {
 											{/* Action Buttons */}
 											<div className="flex gap-3 mt-6">
 												<motion.button
-													whileHover={{ scale: 1.05, backgroundColor: "rgb(168, 85, 247)" }}
+													whileHover={{ scale: 1.05, backgroundColor: "rgb(20, 184, 166)" }}
 													whileTap={{ scale: 0.95 }}
 													onClick={() => {
 														// Export ATS report functionality
@@ -1432,7 +1426,7 @@ export default function OverviewTab({ user }) {
 														element.click();
 														document.body.removeChild(element);
 													}}
-													className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-colors duration-200"
+													className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium transition-colors duration-200"
 												>
 													<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
@@ -1446,7 +1440,7 @@ export default function OverviewTab({ user }) {
 														navigator.clipboard.writeText(atsScoreResult.analysis || atsScoreResult);
 														showToastMessage('Analysis copied to clipboard!');
 													}}
-													className="flex items-center gap-2 px-4 py-2 border border-purple-500/50 text-purple-400 rounded-lg font-medium hover:bg-purple-500/10 transition-colors duration-200"
+													className="flex items-center gap-2 px-4 py-2 border border-emerald-500/50 text-amber-400 rounded-lg font-medium hover:bg-emerald-500/10 transition-colors duration-200"
 												>
 													<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -1484,21 +1478,10 @@ export default function OverviewTab({ user }) {
 							</div>
 						)}
 
-						{/* Quick Actions */}
-						{/* <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-				<Link href="/practice" className="block h-full">
-					<div className="w-full h-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white p-4 rounded-lg hover:from-cyan-700 hover:to-blue-700 transition-all duration-200 flex flex-col justify-start items-start">
-						<div className="text-2xl mb-2">🎯</div>
-						<h3 className="font-semibold">Practice Session</h3>
-						<p className="text-sm opacity-90">Begin a new practice session</p>
-					</div>
-				</Link>
-			</div> */}
 
 						{/* Recent Activities (commented out) */}
 					</div>
 				</div>
-			</div>
 		</>
 	);
 }

@@ -34,7 +34,7 @@ export default function ProfileAvatar({
                     onError={() => setImageError(true)}
                 />
             ) : (
-                <div className={`${sizeClasses[size]} rounded-full flex items-center justify-center font-bold text-white bg-gradient-to-br from-cyan-500 to-blue-700 border-4 border-cyan-400 shadow-lg hover:scale-105 transition-transform duration-200`}>
+                <div className={`${sizeClasses[size]} rounded-full flex items-center justify-center font-bold text-white bg-gradient-to-br from-cyan-500 to-slate-700 border-4 border-cyan-400 shadow-lg hover:scale-105 transition-transform duration-200`}>
                     {initials}
                 </div>
             )}

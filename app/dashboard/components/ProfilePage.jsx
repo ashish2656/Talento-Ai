@@ -289,7 +289,7 @@ export default function ProfilePage({ user, onBack }) {
 								/>
 							</div>
 						) : (
-							<div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold text-white bg-gradient-to-br from-cyan-500 to-blue-700 border-4 border-cyan-400 shadow-lg">
+							<div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold text-white bg-gradient-to-br from-cyan-500 to-slate-700 border-4 border-cyan-400 shadow-lg">
 								{getInitialFromName(profileData.name)}
 							</div>
 						)}

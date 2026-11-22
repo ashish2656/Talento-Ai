@@ -90,7 +90,21 @@ export const useRequestCache = () => {
         // Make the request
         const requestPromise = fetch(url, options)
             .then(async (response) => {
-                const data = await response.json();
+                const responseText = await response.text();
+                let data;
+
+                try {
+                    data = responseText ? JSON.parse(responseText) : {};
+                } catch {
+                    const isHtml = response.headers.get('content-type')?.includes('text/html');
+                    data = {
+                        error: isHtml
+                            ? `The server returned an unexpected error (HTTP ${response.status}).`
+                            : responseText.trim().slice(0, 300) ||
+                              `The server returned an invalid response (HTTP ${response.status}).`,
+                    };
+                }
+
                 const result = { response, data };
 
                 // Cache successful responses
