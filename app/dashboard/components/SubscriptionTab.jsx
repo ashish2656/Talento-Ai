@@ -2,7 +2,6 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
 
 export default function SubscriptionTab() {
 	return (
@@ -62,14 +61,12 @@ export default function SubscriptionTab() {
 								<li>✔️ Priority email support</li>
 								<li>✔️ Access to premium content</li>
 							</ul>
-							<span className="block text-3xl font-bold text-cyan-300 mb-2">
-								&#8377;1399/month
+							<span className="block text-xl font-bold text-cyan-300 mb-2">
+								Currently unavailable
 							</span>
-							<Link href="/payment">
-								<button className="inline-block mt-4 px-6 py-2 rounded-full bg-cyan-400 text-black font-bold hover:bg-cyan-300 transition">
-									Go Pro
-								</button>
-							</Link>
+							<p className="mt-4 text-sm font-semibold text-cyan-200">
+								Paid plans are currently unavailable.
+							</p>
 						</div>
 					</motion.div>,
 					<motion.div key="pricing-3"

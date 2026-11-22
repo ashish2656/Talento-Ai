@@ -131,7 +131,7 @@ npm install
 
 # Set up environment variables
 cp .env.example .env.local
-# Configure your Supabase and Razorpay credentials
+# Configure Supabase credentials; paid subscriptions are currently unavailable.
 
 # Run the development server
 npm run dev
@@ -142,8 +142,6 @@ npm run dev
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-RAZORPAY_KEY_ID=your_razorpay_key_id
-RAZORPAY_KEY_SECRET=your_razorpay_secret
 EMAIL_USER=your_email_user
 EMAIL_PASS=your_email_password
 ```
@@ -156,7 +154,7 @@ EMAIL_PASS=your_email_password
 - Job search with external API integration
 - Assessment system (Technical, Aptitude, Communication, Personality)
 - Dashboard with progress tracking
-- Payment integration with Razorpay
+- Paid subscriptions are currently unavailable
 - LinkedIn OAuth integration
 - Saved jobs functionality
 - Responsive UI with dark/light themes
